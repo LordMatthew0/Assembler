@@ -1,0 +1,88 @@
+//KC03F62P JOB ,'Matthew Lord',MSGCLASS=H                               00010000
+//STEP1    EXEC  PGM=ASSIST                                             00020000
+//STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                    00030000
+//SYSPRINT   DD  SYSOUT=*                                               00040000
+//SYSIN      DD  *                                                      00050000
+*************************************************************           00060000
+*                                                                       00070000
+*  Program:    ASSIGN2                                                  00080000
+*  Programmer: Matthew Lord                                             00090000
+*                                                                       00100000
+*  Register usage:                                                      00110000
+*  1     used by XDECI                                                  00120000
+*  2     counter                                                        00130000
+*  3     total                                                          00140000
+*  5     first number                                                   00150000
+*  6     second number                                                  00160000
+*  7     third number                                                   00170000
+*  8     fourth number                                                  00180000
+*  14    set by ASSIST                                                  00190000
+*  15    set by ASSIST                                                  00200000
+*                                                                       00210000
+*************************************************************           00220000
+MAIN     CSECT                                                          00230000
+         USING MAIN,15                                                  00240000
+         SR    2,2           Initialize counter                         00250000
+         SR    3,3           Initialize total                           00260000
+LOOP     XREAD BUFFER,80     Read a line                                00270007
+         BC    B'0100',LOOPEND   AT EOF,QUIT                            00280006
+         XDECI 5,BUFFER      Get the W value and store it in R5         00300002
+         XDECO 5,WVALUE      Put decimal form into WVALUE               00301002
+         XDECI 6,0(1)        Get the X value and store it in R6         00310002
+         XDECO 6,XVALUE      Put decimal form into XVALUE               00311002
+         XDECI 7,1(1)        Get the Y value and store it in R7         00320002
+         XDECO 7,YVALUE      Put decimal form into YVALUE               00321002
+         XDECI 8,2(1)        Get the Z value and store it in R8         00330002
+         XDECO 8,ZVALUE      Put decimal form into ZVALUE               00331002
+         SR    5,6           Sub the value in R5 by R6 store in R5      00333004
+         AR    5,7           Add values R5 and R7 storing in R5         00334004
+         SR    5,8           Sub the value in R5 by R8 store in R5      00335004
+         XDECO 5,RESULT      Put the decimal form into RESULT           00336003
+         XPRNT LINE,93       Print out everything                       00337010
+         A     2,=F'1'       Add one to the counter                     00337114
+         AR    3,5           Add result to total                        00338013
+         BC    B'1111',LOOP                                             00340006
+LOOPEND  DS    0H                                                       00340108
+         XDECO 3,SOR         Put the decimal form into SOR              00340214
+         XDECO 2,COUNT       Put the decimal form into COUNT            00340314
+         XPRNT LINE2,59      Print out the counter and total            00341014
+         XDUMP                                                          00350000
+         BR    14                                                       00360000
+BUFFER   DS    80C                                                      00370000
+LINE     DC    C' '          Single space carriage control              00371002
+         DC    CL3'W='       Output format for W                        00372002
+WVALUE   DS    12C                                                      00373002
+         DC    CL6'   X='    Output format for X                        00374002
+XVALUE   DS    12C                                                      00375002
+         DC    CL6'   Y='    Output format for Y                        00376002
+YVALUE   DS    12C                                                      00377002
+         DC    CL6'   Z='    Output format for Z                        00378002
+ZVALUE   DS    12C                                                      00379002
+         DC    CL11'   Result='                                         00379110
+RESULT   DS    12C                                                      00379210
+LINE2    DC    C' '          Single space carriage control              00379306
+         DC    CL16'Number of lines='                                   00379414
+COUNT    DS    12C                                                      00379514
+         DC    CL18'   Sum of Results='                                 00379606
+SOR      DS    12C                                                      00379711
+         END   MAIN                                                     00380000
+/*                                                                      00390000
+//FT05F001   DD  *                                                      00400000
+    0006   0001   0002   0004                                           00410000
+    9991   9972   9908   9926                                           00420000
+    4500   -230      9     58                                           00430000
+       0     +7      2    -45                                           00440000
+    8516   2853      0     17                                           00450000
+    0020      0   3245    316                                           00460000
+    5529   6977   1681      0                                           00470000
+    1013    250     85    831                                           00480000
+       0   3364   5275      0                                           00490000
+    -887   1100   2293   -993                                           00500000
+    1234   4447   8591     13                                           00510000
+     -89     -7     23   -104                                           00520000
+    8513   5409   2538   1001                                           00530000
+    0001   0002   0003   0004                                           00540000
+    9999   9998   9997   9996                                           00550000
+/*                                                                      00560000
+//FT06F001   DD SYSOUT=*                                                00570000
+//                                                                      00580000

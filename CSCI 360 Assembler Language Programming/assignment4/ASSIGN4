@@ -1,0 +1,169 @@
+//KC03F62P JOB ,'Matthew Lord',MSGCLASS=H                               00010000
+//STEP1    EXEC  PGM=ASSIST                                             00020000
+//STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                    00030000
+//SYSPRINT   DD  SYSOUT=*                                               00040000
+//SYSIN      DD  *                                                      00050000
+************************************************************            00060000
+*                                                                       00070000
+*  Program:    ASSIGN4                                                  00080000
+*  Programmer: Matthew Lord                                             00090000
+*                                                                       00100000
+*  Register usage:                                                      00110000
+*    1        Used by XDECI                                             00120000
+*   10        Location in program when branched                         00130001
+*   13        Location of params                                        00140001
+*   14        DON'T USE                                                 00150001
+*   15        Base register                                             00160000
+************************************************************            00170000
+MAIN     CSECT                                                          00180000
+         USING MAIN,15                                                  00190000
+         LA    13,TABLE     Load the address of Table                   00200000
+         ST    13,PARMS     Store Table address in params               00210000
+         LA    13,EOT       Load address of end of table                00220000
+         ST    13,PARMS+4   Store end of table in params                00230000
+         LA    13,TABLELEN  Load the address of table length            00240000
+         ST    13,PARMS+8   Store the table lenght in params            00250000
+         LA    13,PARMS     Address of params in R13                    00260001
+         BAL   10,BUILD     Build table                                 00270000
+         BAL   10,PRINT     Print all numbers                           00280000
+         BAL   10,ODDS      Print all odd numbers                       00290001
+         BR    14           End Program                                 00300000
+***********************************                                     00310000
+*                                                                       00320000
+*  Register usage:                                                      00330000
+*    1        Used by XDECI                                             00340000
+*    2        Number in base10                                          00350000
+*    3        Table address                                             00360000
+*    4        EOT address                                               00370000
+*    5        Length of table address                                   00380000
+*    6        Counter                                                   00390000
+*   10        Return address                                            00400000
+*   13        Params                                                    00410001
+*   14        DON'T USE                                                 00420001
+*   15        Base register                                             00430000
+*                                                                       00440000
+***********************************                                     00450000
+BUILD    DS    0H           Start build subroutine                      00460000
+         SR    6,6          Clear R6 to use as a counter                00470001
+         LM    3,5,0(13)    Load params into R3,R4, and R5              00480000
+BLOOP    XREAD BUFFER,80    Read a line from the input file             00490000
+         BL    BEND         Check if read failed                        00500000
+         LA    1,BUFFER     Load the address of buffer into R1          00510000
+BLOOP1   XDECI 2,0(0,1)     Read number from read line                  00520000
+         BO    BLOOP        Check if read failes                        00530000
+         A     6,=F'1'      Add one to counter                          00540000
+         ST    2,0(0,3)     Store number in table                       00550000
+         LA    3,4(0,3)     Advance the table pointer                   00560000
+         CR    3,4          Compare the table pointer to the EOT        00570000
+         BE    BEND         If at EOT end build                         00580000
+         B     BLOOP1       Goto top of loop                            00590000
+BEND     ST    6,0(0,5)     Store the number of elements                00600000
+         BR    10           End subroutine                              00610000
+***********************************                                     00620000
+*                                                                       00630000
+*  Register usage:                                                      00640000
+*    1        Used by XDECI                                             00650000
+*    2        Line string location                                      00660000
+*    3        Table address                                             00670000
+*    4        EOT address                                               00680000
+*    5        Length of table address                                   00690000
+*    6        Width counter                                             00700000
+*    7        Value from table                                          00710000
+*   10        Return address                                            00720000
+*   13        Params                                                    00730001
+*   14        DONT USE                                                  00740000
+*   15        Base register                                             00750000
+*                                                                       00760000
+************************************                                    00770000
+PRINT    DS    0H           Start of subroutine                         00780000
+         XPRNT PHEAD,44     Print the table head                        00790000
+         LM    3,5,0(13)    Load params into R3,R4, and R5              00800000
+         L     5,0(0,5)     Load the lenght of the table                00810000
+PLOOP    L     6,=F'5'      Counter for width of table                  00820001
+         LA    2,PLINE+1    Set R2 to the address of the print line     00830000
+         MVI   PLINE+1,C' ' Clear the print line                        00840000
+         MVC   PLINE+2(71),PLINE+1                                      00850001
+         C     5,=F'0'      Check if all values have been printed       00860000
+         BE    PEND         End if true                                 00870000
+PLOOP1   C     5,=F'0'      Check if all values have been printed       00880000
+         BE    PEND1        End if true                                 00890000
+         L     7,0(0,3)     Get current value from table                00900000
+         XDECO 7,TEMP       Hex to base 10                              00910000
+         MVC   0(12,2),TEMP Store base 10 num in print line             00920000
+         LA    2,12(0,2)    Advance print line pointer                  00930000
+         LA    3,4(0,3)     Advance table pointer                       00940000
+         S     5,=F'1'      Decrement table length counter              00950000
+         S     6,=F'1'      Decrement line width counter                00960000
+         C     6,=F'0'      Check if we have filled a line              00970000
+         BNE   PLOOP1       Goto top of loop1                           00980000
+         XPRNT PLINE,73     Print print line                            00990000
+         B     PLOOP        Goto top of loop                            01000000
+PEND1    XPRNT PLINE,73     Print printline                             01010000
+PEND     BR    10           End of subroutine                           01020000
+***********************************                                     01030000
+*                                                                       01040000
+*  Register usage:                                                      01050000
+*    1        Used by XDECI                                             01060000
+*    2        Line string location                                      01070000
+*    3        Table address                                             01080000
+*    4        EOT address                                               01090000
+*    5        Length of table address                                   01100000
+*    6        Table Var                                                 01110000
+*    7        Used in division                                          01120001
+*    8        Width counter                                             01130000
+*   10        Return address                                            01140000
+*   13        Params                                                    01150001
+*   14        DON'T USE                                                 01160001
+*   15        Base register                                             01170000
+*                                                                       01180000
+***********************************                                     01190000
+ODDS     DS    0H           Start of subroutine                         01200001
+         XPRNT OHEAD,48     Print table head                            01210000
+         LM    3,5,0(13)    Load params into R3,R4, and R5              01220000
+         L     5,0(0,5)     Load lenght of table                        01230000
+OLOOP    L     8,=F'6'      Table width counter                         01240001
+         LA    2,PLINE+1    Load pointer to print line                  01250000
+         MVI   PLINE+1,C' ' Clear print line                            01260000
+         MVC   PLINE+2(71),PLINE+1                                      01270000
+         C     5,=F'0'      Check if we have printed the table          01280000
+         BE    OEND         Goto end of subroutine if true              01290000
+OLOOP1   C     5,=F'0'      Check if we have printed the table          01300000
+         BE    OEND1        Goto end if true                            01310000
+         L     7,0(0,3)     Load the current number                     01320000
+         S     5,=F'1'      Decrement table length                      01330000
+         M     6,=F'1'      Check if odd                                01340000
+         D     6,=F'2'      Check if odd                                01350000
+         C     6,=F'0'      Check if odd                                01360000
+         BE    SKIP         Skip printing if odd                        01370000
+         L     6,0(0,3)     Load the current number                     01380000
+         XDECO 6,TEMP       Hex to Dec                                  01390000
+         MVC   0(12,2),TEMP Store Dec in print line                     01400000
+         LA    2,12(0,2)    Advance print line pointer                  01410000
+         S     8,=F'1'      Decrement line counter                      01420000
+SKIP     LA    3,4(0,3)     Advance table pointer                       01430000
+         C     8,=F'0'      Check if Pline is full                      01440001
+         BNE   OLOOP1       Goto top of loop1                           01450000
+         XPRNT PLINE,73     Print print line                            01460000
+         B     OLOOP        Goto top of loop                            01470000
+OEND1    XPRNT PLINE,73     Print print line                            01480000
+OEND     BR    10           End of subroutine                           01490000
+***********************************                                     01500000
+         LTORG                Literals are put here                     01510000
+TABLE    DS    60F'-8'                                                  01520000
+EOT      DS    0H                                                       01530000
+TABLELEN DS    F'0'                                                     01540000
+PHEAD    DC    CL44'1                            List of Numbers'       01550000
+OHEAD    DC    CL48'1                            List of Odd Numbers'   01560000
+TEMP     DS    CL12' '                                                  01570000
+PARMS    DS    F'0'                                                     01580000
+         DS    F'0'                                                     01590000
+         DS    F'0'                                                     01600000
+PLINE    DC    CL1'0'                                                   01610000
+         DS    CL72' '                                                  01620000
+BUFFER   DS    80C                                                      01630000
+         DC    C'*'                                                     01640000
+         END   MAIN                                                     01650000
+/*                                                                      01660000
+//FT05F001  DD  DSN=KC02314.SUMMER18.CSCI360.HW4DATA,DISP=SHR           01670000
+//FT06F001   DD SYSOUT=*                                                01680000
+//                                                                      01690000

@@ -1,0 +1,138 @@
+1                    J E S 2  J O B  L O G  --  S Y S T E M  S 0 W 1  --  N O D E  Z O S K C T R         
+0 
+ 13.05.39 JOB09239 ---- SATURDAY,  30 JUN 2018 ----
+ 13.05.39 JOB09239  IRR010I  USERID KC03F62  IS ASSIGNED TO THIS JOB.
+ 13.05.39 JOB09239  ICH70001I KC03F62  LAST ACCESS AT 13:03:20 ON SATURDAY, JUNE 30, 2018
+ 13.05.39 JOB09239  $HASP373 KC03F62P STARTED - INIT 1    - CLASS A        - SYS S0W1
+ 13.05.39 JOB09239  -                                         --TIMINGS (MINS.)--            ----PAGING COUNTS---
+ 13.05.39 JOB09239  -JOBNAME  STEPNAME PROCSTEP    RC   EXCP    TCB    SRB  CLOCK   SERV  PG   PAGE   SWAP    VIO SWAPS
+ 13.05.39 JOB09239  -KC03F62P                      00     45 ******    .00     .0    110   0      0      0      0     0
+ 13.05.39 JOB09239  -KC03F62P ENDED.  NAME-Matthew Lord         TOTAL TCB CPU TIME=   .00  TOTAL ELAPSED TIME=    .0
+ 13.05.39 JOB09239  $HASP395 KC03F62P ENDED
+0------ JES2 JOB STATISTICS ------
+-  30 JUN 2018 JOB EXECUTION DATE
+-           86 CARDS READ
+-          138 SYSOUT PRINT RECORDS
+-            0 SYSOUT PUNCH RECORDS
+-           13 SYSOUT SPOOL KBYTES
+-         0.00 MINUTES EXECUTION TIME
+         1 //KC03F62P JOB ,'Matthew Lord',MSGCLASS=H                               JOB09239
+         2 //STEP1    EXEC  PGM=ASSIST                                             00020000
+         3 //STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                    00030000
+         4 //SYSPRINT   DD  SYSOUT=*                                               00040000
+         5 //SYSIN      DD  *                                                      00050000
+         6 //FT05F001   DD  *                                                      00400000
+         7 //FT06F001   DD SYSOUT=*                                                00570000
+ ICH70001I KC03F62  LAST ACCESS AT 13:03:20 ON SATURDAY, JUNE 30, 2018
+ IEF236I ALLOC. FOR KC03F62P STEP1
+ IGD103I SMS ALLOCATED TO DDNAME STEPLIB
+ IEF237I JES2 ALLOCATED TO SYSPRINT
+ IEF237I JES2 ALLOCATED TO SYSIN
+ IEF237I JES2 ALLOCATED TO FT05F001
+ IEF237I JES2 ALLOCATED TO FT06F001
+ IEF142I KC03F62P STEP1 - STEP WAS EXECUTED - COND CODE 0000
+ IGD104I KC02293.ASSIST.LOADLIB                       RETAINED,  DDNAME=STEPLIB 
+ IEF285I   KC03F62.KC03F62P.JOB09239.D0000103.?         SYSOUT        
+ IEF285I   KC03F62.KC03F62P.JOB09239.D0000101.?         SYSIN         
+ IEF285I   KC03F62.KC03F62P.JOB09239.D0000102.?         SYSIN         
+ IEF285I   KC03F62.KC03F62P.JOB09239.D0000104.?         SYSOUT        
+ IEF373I STEP/STEP1   /START 2018181.1305
+ IEF032I STEP/STEP1   /STOP  2018181.1305 
+         CPU:     0 HR  00 MIN  00.00 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+         VIRT:   584K  SYS:   268K  EXT:        0K  SYS:    11468K
+         ATB- REAL:                     0K  SLOTS:                     0K
+              VIRT- ALLOC:       0M SHRD:       0M
+ IEF375I  JOB/KC03F62P/START 2018181.1305
+ IEF033I  JOB/KC03F62P/STOP  2018181.1305 
+         CPU:     0 HR  00 MIN  00.00 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+1*** ASSIST 4.0/A2-05/15/82  470/V7A/0:OS/VS2  INS=SDFP7/X=BGHO, CHECK/TRC/=1180, OPTS=CDKMPR FROM PENN ST*NIU COMPSCI*LT         
+0                                                                                                                                 
+0                                                                                                               PAGE    1         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                       1 *************************************************************           00060000         
+                                       2 *                                                                       00070000         
+                                       3 *  Program:    ASSIGN2                                                  00080000         
+                                       4 *  Programmer: Matthew Lord                                             00090000         
+                                       5 *                                                                       00100000         
+                                       6 *  Register usage:                                                      00110000         
+                                       7 *  1     used by XDECI                                                  00120000         
+                                       8 *  2     counter                                                        00130000         
+                                       9 *  3     total                                                          00140000         
+                                      10 *  5     first number                                                   00150000         
+                                      11 *  6     second number                                                  00160000         
+                                      12 *  7     third number                                                   00170000         
+                                      13 *  8     fourth number                                                  00180000         
+                                      14 *  14    set by ASSIST                                                  00190000         
+                                      15 *  15    set by ASSIST                                                  00200000         
+                                      16 *                                                                       00210000         
+                                      17 *************************************************************           00220000         
+ 000000                               18 MAIN     CSECT                                                          00230000         
+ 000000                               19          USING MAIN,15                                                  00240000         
+ 000000 1B22                          20          SR    2,2           Initialize counter                         00250000         
+ 000002 1B33                          21          SR    3,3           Initialize total                           00260000         
+ 000004 E000 F058 0050 00058          22 LOOP     XREAD BUFFER,80     Read a line                                00270007         
+ 00000A 4740 F048            00048    23          BC    B'0100',LOOPEND   AT EOF,QUIT                            00280006         
+ 00000E 5350 F058            00058    24          XDECI 5,BUFFER      Get the W value and store it in R5         00300002         
+ 000012 5250 F0AC            000AC    25          XDECO 5,WVALUE      Put decimal form into WVALUE               00301002         
+ 000016 5361 0000            00000    26          XDECI 6,0(1)        Get the X value and store it in R6         00310002         
+ 00001A 5260 F0BE            000BE    27          XDECO 6,XVALUE      Put decimal form into XVALUE               00311002         
+ 00001E 5371 0001            00001    28          XDECI 7,1(1)        Get the Y value and store it in R7         00320002         
+ 000022 5270 F0D0            000D0    29          XDECO 7,YVALUE      Put decimal form into YVALUE               00321002         
+ 000026 5381 0002            00002    30          XDECI 8,2(1)        Get the Z value and store it in R8         00330002         
+ 00002A 5280 F0E2            000E2    31          XDECO 8,ZVALUE      Put decimal form into ZVALUE               00331002         
+ 00002E 1B56                          32          SR    5,6           Sub the value in R5 by R6 store in R5      00333004         
+ 000030 1A57                          33          AR    5,7           Add values R5 and R7 storing in R5         00334004         
+ 000032 1B58                          34          SR    5,8           Sub the value in R5 by R8 store in R5      00335004         
+ 000034 5250 F0F9            000F9    35          XDECO 5,RESULT      Put the decimal form into RESULT           00336003         
+ 000038 E020 F0A8 005D 000A8          36          XPRNT LINE,93       Print out everything                       00337010         
+ 00003E 5A20 F140            00140    37          A     2,=F'1'       Add one to the counter                     00337114         
+ 000042 1A35                          38          AR    3,5           Add result to total                        00338013         
+ 000044 47F0 F004            00004    39          BC    B'1111',LOOP                                             00340006         
+ 000048                               40 LOOPEND  DS    0H                                                       00340108         
+ 000048 5230 F134            00134    41          XDECO 3,SOR         Put the decimal form into SOR              00340214         
+ 00004C 5220 F116            00116    42          XDECO 2,COUNT       Put the decimal form into COUNT            00340314         
+ 000050 E020 F105 003B 00105          43          XPRNT LINE2,59      Print out the counter and total            00341014         
+ 000056 07FE                          44          BR    14                                                       00360000         
+ 000058                               45 BUFFER   DS    80C                                                      00370000         
+ 0000A8 40                            46 LINE     DC    C' '          Single space carriage control              00371002         
+ 0000A9 E67E40                        47          DC    CL3'W='       Output format for W                        00372002         
+ 0000AC                               48 WVALUE   DS    12C                                                      00373002         
+ 0000B8 404040E77E40                  49          DC    CL6'   X='    Output format for X                        00374002         
+ 0000BE                               50 XVALUE   DS    12C                                                      00375002         
+ 0000CA 404040E87E40                  51          DC    CL6'   Y='    Output format for Y                        00376002         
+ 0000D0                               52 YVALUE   DS    12C                                                      00377002         
+1                                                                                                               PAGE    2         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+ 0000DC 404040E97E40                  53          DC    CL6'   Z='    Output format for Z                        00378002         
+ 0000E2                               54 ZVALUE   DS    12C                                                      00379002         
+ 0000EE 404040D985A2A493              55          DC    CL11'   Result='                                         00379110         
+ 0000F9                               56 RESULT   DS    12C                                                      00379210         
+ 000105 40                            57 LINE2    DC    C' '          Single space carriage control              00379306         
+ 000106 D5A4948285994096              58          DC    CL16'Number of lines='                                   00379414         
+ 000116                               59 COUNT    DS    12C                                                      00379514         
+ 000122 404040E2A4944096              60          DC    CL18'   Sum of Results='                                 00379606         
+ 000134                               61 SOR      DS    12C                                                      00379711         
+                                      62          END   MAIN                                                     00380000         
+ 000140 00000001                      63                =F'1'                                                                     
+0***  NO   STATEMENTS FLAGGED -  NO   WARNINGS,  NO   ERRORS                                                                      
+0*** DYNAMIC CORE AREA USED:  LOW:    3220 HIGH:     568 LEAVING:  489780 FREE BYTES. AVERAGE:       59 BYTES/STMT ***            
+0*** ASSEMBLY TIME =    0.000 SECS,    64000 STATEMENTS/SEC ***                                                                   
+0*** PROGRAM EXECUTION BEGINNING - ANY OUTPUT BEFORE EXECUTION TIME MESSAGE IS PRODUCED BY USER PROGRAM ***                       
+ W=            6   X=            1   Y=            2   Z=            4   Result=            3                                     
+ W=         9991   X=         9972   Y=         9908   Z=         9926   Result=            1                                     
+ W=         4500   X=         -230   Y=            9   Z=           58   Result=         4681                                     
+ W=            0   X=            7   Y=            2   Z=          -45   Result=           40                                     
+ W=         8516   X=         2853   Y=            0   Z=           17   Result=         5646                                     
+ W=           20   X=            0   Y=         3245   Z=          316   Result=         2949                                     
+ W=         5529   X=         6977   Y=         1681   Z=            0   Result=          233                                     
+ W=         1013   X=          250   Y=           85   Z=          831   Result=           17                                     
+ W=            0   X=         3364   Y=         5275   Z=            0   Result=         1911                                     
+ W=         -887   X=         1100   Y=         2293   Z=         -993   Result=         1299                                     
+ W=         1234   X=         4447   Y=         8591   Z=           13   Result=         5365                                     
+ W=          -89   X=           -7   Y=           23   Z=         -104   Result=           45                                     
+ W=         8513   X=         5409   Y=         2538   Z=         1001   Result=         4641                                     
+ W=            1   X=            2   Y=            3   Z=            4   Result=           -2                                     
+ W=         9999   X=         9998   Y=         9997   Z=         9996   Result=            2                                     
+ Number of lines=          15   Sum of Results=       26831                                                                       
+0*** EXECUTION TIME =    0.000 SECS.       278 INSTRUCTIONS EXECUTED -   278000 INSTRUCTIONS/SEC ***                              
+0*** AM004 - NORMAL USER TERMINATION BY RETURN ***                                                                                

@@ -1,0 +1,209 @@
+1                    J E S 2  J O B  L O G  --  S Y S T E M  S 0 W 1  --  N O D E  Z O S K C T R         
+0 
+ 19.55.07 JOB05198 ---- SATURDAY,  07 JUL 2018 ----
+ 19.55.07 JOB05198  IRR010I  USERID KC03F62  IS ASSIGNED TO THIS JOB.
+ 19.55.07 JOB05198  ICH70001I KC03F62  LAST ACCESS AT 19:49:58 ON SATURDAY, JULY 7, 2018
+ 19.55.07 JOB05198  $HASP373 KC03F62P STARTED - INIT 2    - CLASS A        - SYS S0W1
+ 19.55.07 JOB05198  -                                         --TIMINGS (MINS.)--            ----PAGING COUNTS---
+ 19.55.07 JOB05198  -JOBNAME  STEPNAME PROCSTEP    RC   EXCP    TCB    SRB  CLOCK   SERV  PG   PAGE   SWAP    VIO SWAPS
+ 19.55.07 JOB05198  -KC03F62P                      00     70 ******    .00     .0    203   0      0      0      0     0
+ 19.55.07 JOB05198  -KC03F62P ENDED.  NAME-Matthew Lord         TOTAL TCB CPU TIME=   .00  TOTAL ELAPSED TIME=    .0
+ 19.55.07 JOB05198  $HASP395 KC03F62P ENDED
+0------ JES2 JOB STATISTICS ------
+-  07 JUL 2018 JOB EXECUTION DATE
+-          124 CARDS READ
+-          209 SYSOUT PRINT RECORDS
+-            0 SYSOUT PUNCH RECORDS
+-           21 SYSOUT SPOOL KBYTES
+-         0.00 MINUTES EXECUTION TIME
+         1 //KC03F62P JOB ,'Matthew Lord',MSGCLASS=H                               JOB05198
+         2 //STEP1    EXEC  PGM=ASSIST                                             00020000
+         3 //STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                    00030000
+         4 //SYSPRINT   DD  SYSOUT=*                                               00040000
+         5 //SYSIN      DD  *                                                      00050000
+         6 //FT05F001   DD  DSN=KC02314.SUMMER18.CSCI360.HW3DATA,DISP=SHR          00870000
+         7 //FT06F001   DD SYSOUT=*                                                00880000
+ ICH70001I KC03F62  LAST ACCESS AT 19:49:58 ON SATURDAY, JULY 7, 2018
+ IEF236I ALLOC. FOR KC03F62P STEP1
+ IGD103I SMS ALLOCATED TO DDNAME STEPLIB
+ IEF237I JES2 ALLOCATED TO SYSPRINT
+ IEF237I JES2 ALLOCATED TO SYSIN
+ IGD103I SMS ALLOCATED TO DDNAME FT05F001
+ IEF237I JES2 ALLOCATED TO FT06F001
+ IEF142I KC03F62P STEP1 - STEP WAS EXECUTED - COND CODE 0000
+ IGD104I KC02293.ASSIST.LOADLIB                       RETAINED,  DDNAME=STEPLIB 
+ IEF285I   KC03F62.KC03F62P.JOB05198.D0000102.?         SYSOUT        
+ IEF285I   KC03F62.KC03F62P.JOB05198.D0000101.?         SYSIN         
+ IGD104I KC02314.SUMMER18.CSCI360.HW3DATA             RETAINED,  DDNAME=FT05F001
+ IEF285I   KC03F62.KC03F62P.JOB05198.D0000103.?         SYSOUT        
+ IEF373I STEP/STEP1   /START 2018188.1955
+ IEF032I STEP/STEP1   /STOP  2018188.1955 
+         CPU:     0 HR  00 MIN  00.01 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+         VIRT:   584K  SYS:   268K  EXT:        4K  SYS:    11412K
+         ATB- REAL:                     0K  SLOTS:                     0K
+              VIRT- ALLOC:       0M SHRD:       0M
+ IEF375I  JOB/KC03F62P/START 2018188.1955
+ IEF033I  JOB/KC03F62P/STOP  2018188.1955 
+         CPU:     0 HR  00 MIN  00.01 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+1*** ASSIST 4.0/A2-05/15/82  470/V7A/0:OS/VS2  INS=SDFP7/X=BGHO, CHECK/TRC/=1180, OPTS=CDKMPR FROM PENN ST*NIU COMPSCI*LT         
+0                                                                                                                                 
+0                                                                                                               PAGE    1         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                       1 *********************************************************               00060000         
+                                       2 *                                                                       00070000         
+                                       3 * Program:     ASSIGN3                                                  00080000         
+                                       4 * Programmer:  Matthew Lord                                             00090000         
+                                       5 *                                                                       00100000         
+                                       6 * Register usage:                                                       00110000         
+                                       7 * 1     used by XDECI                                                   00120000         
+                                       8 * 2     counter                                                         00130000         
+                                       9 * 3     total                                                           00140000         
+                                      10 * 5     order id                                                        00150000         
+                                      11 * 6     number ordered                                                  00160000         
+                                      12 * 8     price of item                                                   00170000         
+                                      13 * 9     product id                                                      00180000         
+                                      14 * 10    discount                                                        00190000         
+                                      15 * 11    shipping                                                        00200000         
+                                      16 * 12    counter for free shipping                                       00201022         
+                                      17 * 14    set by ASSIST                                                   00210000         
+                                      18 * 15    set by ASSIST                                                   00220000         
+                                      19 *                                                                       00230000         
+                                      20 ***********************************************                         00240000         
+ 000000                               21 MAIN     CSECT                                                          00250000         
+ 000000                               22          USING MAIN,15                                                  00260000         
+ 000000 1B22                          23          SR    2,2                Initialize counter                    00270000         
+ 000002 1B33                          24          SR    3,3                Initialize total                      00280000         
+ 000004 1BCC                          25          SR    12,12              Initialize counter for shipping       00281026         
+ 000006 E020 F0DC 001D 000DC          26          XPRNT HEADER,29          Print out the header                  00290000         
+ 00000C E020 F0F9 005E 000F9          27          XPRNT INFO,94           Print out the column headers           00300000         
+ 000012 E000 F157 0050 00157          28 LOOP     XREAD BUFFER,80          Read a line                           00310000         
+ 000018 4740 F098            00098    29          BC    B'0100',LOOPEND    At EOF,quit                           00320000         
+ 00001C 5350 F157            00157    30          XDECI 5,BUFFER           Get the order id and store it in R5   00330000         
+ 000020 5250 F1A8            001A8    31          XDECO 5,ORDERID          Store that value into ORDERID         00340000         
+ 000024 5361 0000            00000    32          XDECI 6,0(1)             Get the number ordered store it in R6 00350000         
+ 000028 5260 F1CC            001CC    33          XDECO 6,NUMORDER         Store that value into NUMORDER        00360000         
+ 00002C 5381 0001            00001    34          XDECI 8,1(1)             Get the price each and store it in R8 00370000         
+ 000030 5280 F1C0            001C0    35          XDECO 8,PRICE            Store that value into PRICE           00380000         
+ 000034 5391 0002            00002    36          XDECI 9,2(1)             Get the produt id and store it in R9  00390000         
+ 000038 5290 F1B4            001B4    37          XDECO 9,PID              Store that value into PID             00400000         
+                                      38 * Code for getting PreTotal                                             00410000         
+ 00003C 1876                          39          LR    7,6                Load the value of R6 into R7          00420011         
+ 00003E 1C68                          40          MR    6,8                Multiply the price by the num ordered 00430012         
+                                      41 * Code for getting discount                                             00440000         
+ 000040 5970 F288            00288    42          C     7,=F'25000'        Compare R7 and the value 25000        00450007         
+ 000044 47D0 F04C            0004C    43          BNH   ENDIF              If the pretotal is greater then 25000 00460018         
+ 000048 58A0 F28C            0028C    44          L     10,=F'500'         Load the discount into R10            00470002         
+ 00004C 4720 F054            00054    45 ENDIF    BH    ENDIF1             If the pretotal is less then 25000    00480018         
+ 000050 58A0 F290            00290    46          L     10,=F'0'           Load the discount into R10            00490002         
+ 000054 52A0 F1D8            001D8    47 ENDIF1   XDECO 10,DISCOUNT        Store that value into DISCOUNT        00500000         
+                                      48 * Code for getting shipping                                             00510000         
+ 000058 5970 F294            00294    49          C     7,=F'10000'        Compare R7 and the value 10000        00520007         
+ 00005C 47D0 F068            00068    50          BNH   ENDIF3             If the pretotal is greater then 10000 00530018         
+ 000060 58B0 F290            00290    51          L     11,=F'0'           Load shipping into R11                00540002         
+ 000064 5AC0 F298            00298    52          A     12,=F'1'           Add to the count of free shipping     00541022         
+1                                                                                                               PAGE    2         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+ 000068 4720 F070            00070    53 ENDIF3   BH    ENDIF4             If the pretotal is less then 10000    00550018         
+ 00006C 58B0 F29C            0029C    54          L     11,=F'750'         Load shipping into R11                00560002         
+ 000070 4770 F07C            0007C    55 ENDIF4   BNE   ENDIF5             If they are not equal branch          00561019         
+ 000074 58B0 F290            00290    56          L     11,=F'0'           Load shipping into R11                00562022         
+ 000078 5AC0 F298            00298    57          A     12,=F'1'           Add to the count of free shipping     00563023         
+ 00007C 52B0 F1E4            001E4    58 ENDIF5   XDECO 11,SHIPPING        Store the value into SHIPPING         00570019         
+ 000080 1A7B                          59          AR    7,11               Add shipping to pretotal              00580021         
+ 000082 1B7A                          60          SR    7,10               Subtract the discount                 00590021         
+ 000084 5270 F1F0            001F0    61          XDECO 7,TOTAL            Store the total price into TOTAL      00600008         
+ 000088 E020 F1A7 0055 001A7          62          XPRNT LINE,85            Print out the data                    00610017         
+ 00008E 5A20 F298            00298    63          A     2,=F'1'            Add one to the counter                00620000         
+ 000092 1A37                          64          AR    3,7                Add to grand total                    00621015         
+ 000094 47F0 F012            00012    65          BC    B'1111',LOOP                                             00630000         
+ 000098                               66 LOOPEND  DS    0H                                                       00640000         
+ 000098 5220 F214            00214    67          XDECO 2,COUNTER          Store the counter into COUNTER        00641005         
+ 00009C E020 F1FC 0024 001FC          68          XPRNT CT,36                                                    00642005         
+ 0000A2 52C0 F23B            0023B    69          XDECO 12,FREE            Store the shipping counter into FREE  00642122         
+ 0000A6 E020 F220 0027 00220          70          XPRNT FS,39                                                    00642227         
+ 0000AC 5230 F259            00259    71          XDECO 3,GRAND            Store the grand total into GRAND      00643014         
+ 0000B0 E020 F247 001E 00247          72          XPRNT GT,30                                                    00644024         
+ 0000B6 1B44                          73          SR    4,4                Clear out R4                          00644130         
+ 0000B8 1853                          74          LR    5,3                Load R3 into R5                       00644230         
+ 0000BA 1D42                          75          DR    4,2                To get the average                    00645033         
+ 0000BC 1A44                          76          AR    4,4                Double R4                             00646035         
+ 0000BE 1942                          77          CR    4,2                Compare R4 and R2                     00647033         
+ 0000C0 47D0 F0C8            000C8    78          BNH   ENDIF6                                                   00648033         
+ 0000C4 5A50 F298            00298    79          A     5,=F'1'            Add one to R5                         00649036         
+ 0000C8 4770 F0D0            000D0    80 ENDIF6   BNE    ENDIF7            If they are equal                     00649137         
+ 0000CC 5A50 F298            00298    81          A     5,=F'1'            Add one to R5                         00649236         
+ 0000D0 5250 F279            00279    82 ENDIF7   XDECO 5,AVG              Store the average in AVG              00649336         
+ 0000D4 E020 F265 0020 00265          83          XPRNT AVERAGE,32                                               00649433         
+ 0000DA 07FE                          84          BR    14                                                       00660000         
+ 0000DC F0                            85 HEADER   DC    C'0'               Double space carriage control         00670000         
+ 0000DD E2819385A240D985              86          DC    CL28'Sales Report -- Widgets-R-US'                       00680000         
+ 0000F9 F0                            87 INFO     DC    C'0'               Double space carriage control         00690000         
+ 0000FA D6D9C4C5D940C9C4              88          DC    CL13'ORDER ID     '                                      00700000         
+ 000107 D7D9D6C4E4C3E340              89          DC    CL15'PRODUCT ID     '                                    00710000         
+ 000116 D7D9C9C3C540C5C1              90          DC    CL15'PRICE EACH     '                                    00720000         
+ 000125 D5E4D4C2C5D940D6              91          DC    CL19'NUMBER ORDERED     '                                00730000         
+ 000138 C4C9E2C3D6E4D5E3              92          DC    CL13'DISCOUNT     '                                      00740000         
+ 000145 E2C8C9D7D7C9D5C7              93          DC    CL13'SHIPPING     '                                      00750000         
+ 000152 E3D6E3C1D3                    94          DC    CL5'TOTAL'                                               00760000         
+ 000157                               95 BUFFER   DS    80C                                                      00770000         
+ 0001A7 F0                            96 LINE     DC    C'0'               Double space carriage control         00780000         
+ 0001A8                               97 ORDERID  DS    12C                For printing out the order id         00790000         
+ 0001B4                               98 PID      DS    12C                For printing out the product id       00800000         
+ 0001C0                               99 PRICE    DS    12C                For printing out the price            00801001         
+ 0001CC                              100 NUMORDER DS    12C                For printing out the number ordered   00810000         
+ 0001D8                              101 DISCOUNT DS    12C                For printing out the discount         00820000         
+ 0001E4                              102 SHIPPING DS    12C                For printing out the shipping         00830000         
+ 0001F0                              103 TOTAL    DS    12C                For printing out the total cost       00840004         
+ 0001FC F0                           104 CT       DC    C'0'               Double space carriage control         00841005         
+ 0001FD E3D6E3C1D340D5E4             105          DC    CL23'TOTAL NUMBER OF SALES:'                             00842038         
+ 000214                              106 COUNTER  DS    12C                For printing out the counter          00843005         
+ 000220 F0                           107 FS       DC    C'0'               Double space carriage control         00843122         
+ 000221 D5E4D4C2C5D940E6             108          DC    CL26'NUMBER WITH FREE SHIPPING:'                         00843222         
+ 00023B                              109 FREE     DS    12C                For printing free shipping count      00843325         
+1                                                                                                               PAGE    3         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+ 000247 F0                           110 GT       DC    C'0'               Double space carriage control         00843424         
+ 000248 E2E4D440D6C640C1             111          DC    CL17'SUM OF ALL SALES:'                                  00845014         
+ 000259                              112 GRAND    DS    12C                For printing out the grand total      00846014         
+ 000265 F0                           113 AVERAGE  DC    C'0'               Double space carriage control         00847033         
+ 000266 C1E5C5D9C1C7C540             114          DC    CL19'AVERAGE SALE TOTAL:'                                00848033         
+ 000279                              115 AVG      DS    12C                                                      00849033         
+                                     116          END   MAIN                                                     00850000         
+ 000288 000061A8                     117                =F'25000'                                                                 
+ 00028C 000001F4                     118                =F'500'                                                                   
+ 000290 00000000                     119                =F'0'                                                                     
+ 000294 00002710                     120                =F'10000'                                                                 
+ 000298 00000001                     121                =F'1'                                                                     
+ 00029C 000002EE                     122                =F'750'                                                                   
+0***  NO   STATEMENTS FLAGGED -  NO   WARNINGS,  NO   ERRORS                                                                      
+0*** DYNAMIC CORE AREA USED:  LOW:    7748 HIGH:     980 LEAVING:  484840 FREE BYTES. AVERAGE:       70 BYTES/STMT ***            
+0*** ASSEMBLY TIME =    0.000 SECS,   123000 STATEMENTS/SEC ***                                                                   
+0*** PROGRAM EXECUTION BEGINNING - ANY OUTPUT BEFORE EXECUTION TIME MESSAGE IS PRODUCED BY USER PROGRAM ***                       
+0Sales Report -- Widgets-R-US                                                                                                     
+0ORDER ID     PRODUCT ID     PRICE EACH     NUMBER ORDERED     DISCOUNT     SHIPPING     TOTAL                                    
+0      731128    94709463        3333           3           0         750       10749                                             
+0      734023    10932746         500          20           0           0       10000                                             
+0      558594    81238096         250           1           0         750        1000                                             
+0      587395    13745318        8333           3           0           0       24999                                             
+0      664940    66965572       25001           1         500           0       24501                                             
+0      566824    91975595        1650          47         500           0       77050                                             
+0      973754    48206368        1500         147         500           0      220000                                             
+0      133160    21739517        1000         186         500           0      185500                                             
+0      401286    85564923        1495           8           0           0       11960                                             
+0      783128    82317546         995           1           0         750        1745                                             
+0      456882    67298067        1325          40         500           0       52500                                             
+0      719047    60569327         705         110         500           0       77050                                             
+0      978660    96123148          65          16           0         750        1790                                             
+0      554005    68590474        2000         110         500           0      219500                                             
+0      402455    72788584         645         121         500           0       77545                                             
+0      339322    76966142         149           8           0         750        1942                                             
+0      777444    12857367         500           2           0         750        1750                                             
+1      888555    76234457       14000           5         500           0       69500                                             
+0      777777    54834939        3333          13         500           0       42829                                             
+0      549265    10124896          95          42           0         750        4740                                             
+0TOTAL NUMBER OF SALES:           20                                                                                              
+0NUMBER WITH FREE SHIPPING:          13                                                                                           
+0SUM OF ALL SALES:     1116650                                                                                                    
+0AVERAGE SALE TOTAL:       55833                                                                                                  
+0*** EXECUTION TIME =    0.002 SECS.       638 INSTRUCTIONS EXECUTED -   319000 INSTRUCTIONS/SEC ***                              
+0*** AM004 - NORMAL USER TERMINATION BY RETURN ***                                                                                

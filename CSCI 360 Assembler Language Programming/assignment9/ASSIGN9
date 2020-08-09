@@ -1,0 +1,75 @@
+//KC03F62P JOB ,'Matthew Lord',MSGCLASS=H                               00011001
+//STEP1   EXEC  PGM=ASSIST,PARM='MACRO=H'                               00021001
+//STEPLIB   DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                     00031001
+//SYSPRINT  DD  SYSOUT=*                                                00041001
+//SYSIN     DD  *                                                       00051001
+*********************************************************************   00060000
+*                                                                       00070000
+*  Program:     ASSIGN9                                                 00080000
+*  Programmer:  Matthew Lord                                            00090000
+*********************************************************************   00100000
+*                                                                       00110000
+*  Name: STRLEN                                                         00120000
+*                                                                       00130000
+*  Register usage:                                                      00140000
+*  2 Pointer to &STR                                                    00150000
+*  3 Counter                                                            00151000
+*********************************************************************   00160000
+         MACRO                    Start macro                           00170000
+         STRLEN &STR,&LEN         The macro's name is STRLEN            00180000
+         AIF   ('&STR' EQ '').ERROR   If first argument is missing      00190000
+         AIF   ('&LEN' EQ '').ERROR   If second argument is missing     00200000
+         STM   2,3,A&SYSNDX       Back up the parms                     00210000
+         B     B&SYSNDX           Branch over save area                 00220000
+A&SYSNDX DS    2F                 Save area                             00230000
+B&SYSNDX LA    2,&STR             Store pointer to first param in R2    00240000
+         SR    3,3                Clear R3 for storage of counter       00250004
+C&SYSNDX DS    0H                 Top of loop                           00260003
+         CLI   0(2),X'00'         Check to see if end of string         00270003
+         BE    D&SYSNDX           If true branch to end of macro        00280002
+         A     3,=F'1'            Add one to counter                    00290000
+         LA    2,1(2)             Advance pointer                       00300000
+         B     C&SYSNDX           Branch to top of loop                 00310003
+D&SYSNDX DS    0H                 End of macro label                    00320000
+         ST    3,&LEN             Store R3 into &LEN                    00321003
+         LM    2,3,A&SYSNDX       Restore the registers used            00330000
+         MEXIT                    Exit macro                            00340000
+.ERROR   MNOTE 'Missing Argument'                                       00350000
+         MEND                     End macro code                        00360000
+*********************************************************************   00370000
+*                                                                       00380000
+*  Name:FROMHEX                                                         00390000
+*                                                                       00400000
+*  Register usage:                                                      00410000
+*  2 Pointer for &IN                                                    00420005
+*  3 placeholder!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                          00421005
+*                                                                       00430000
+**********************************************************************  00440000
+         MACRO                    Start of macro code                   00450000
+         FROMHEX &IN,&OUT                                               00460000
+         AIF   ('&IN' EQ '').ERROR  if in is blank error                00470000
+         AIF   ('&OUT' EQ '').ERROR if out is blank error               00480000
+         STM   2,4,Z&SYSNDX       Store registers 2-4                   00490000
+         B     Y&SYSNDX           Branch over save area                 00500000
+Z&SYSNDX DS    3F                                                       00510000
+X&SYSNDX DS    D                                                        00511020
+Y&SYSNDX DS    0H                                                       00520000
+*        L     2,&IN              Load in into R2                       00530016
+*        MVC   X&SYSNDX(6),&IN                                          00530110
+         PACK  X&SYSNDX,&IN                                             00530214
+         CVB   2,X&SYSNDX                                               00530319
+         CVD   2,X&SYSNDX                                               00530421
+         UNPK  &OUT,X&SYSNDX                                            00530523
+*                                                                       00530605
+         SR    3,3                                                      00530705
+         L     3,=CL6'000000'                                           00530817
+*        ST    3,&OUT                                                   00530918
+         LM    2,4,Z&SYSNDX       Restore registers                     00531000
+*                                                                       00540000
+         MEXIT                    Exit macro                            00550000
+.ERROR   MNOTE 'Missing Argument'                                       00560000
+         MEND                                                           00570000
+//          DD DSN=KC02314.SUMMER18.CSCI360.HW9DRVR,DISP=SHR            00581001
+//FT05F001  DD DUMMY                                                    00590000
+//FT06F001  DD SYSOUT=*                                                 00600000
+//                                                                      00610000

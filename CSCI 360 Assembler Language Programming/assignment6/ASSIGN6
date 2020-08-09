@@ -1,0 +1,237 @@
+//KC03F62P JOB ,'Matthew Lord',MSGCLASS=H                               00010000
+//STEP1    EXEC  PGM=ASSIST                                             00020000
+//STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                    00030000
+//SYSPRINT   DD  SYSOUT=*                                               00040000
+//SYSIN      DD  *                                                      00050000
+********************************************************************    00060000
+*                                                                       00070000
+*  Program:     ASSIGN6                                                 00080000
+*  Programmer:  Matthew Lord                                            00090000
+********************************************************************    00100004
+ENTRY    DSECT                    Format for Table                      00101004
+FNAME    DS    10C                                                      00102004
+LNAME    DS    10C                                                      00103004
+PASSWORD DS    8C                                                       00103104
+ID       DS    8C                                                       00104004
+EDATE    DS    8C                                                       00104108
+BAL      DS    7C                                                       00105008
+********************************************************************    00106004
+*  Register usage:                                                      00110000
+*  15   MAIN                                                            00120000
+*  14   EXIT                                                            00130000
+*  1    Params                                                          00140000
+********************************************************************    00150000
+MAIN     CSECT                                                          00160000
+         USING MAIN,15                                                  00170000
+         ST    14,EXIT            Save Exit Loacation                   00180000
+         LA    13,SAVEM           Set the save area                     00190000
+         ZAP   PCOUNT(2),=PL1'0'                                        00200000
+         LA    1,TABLE            Start loading params into PARMS       00210000
+         ST    1,PARMS                                                  00220000
+         LA    1,EOT                                                    00230000
+         ST    1,PARMS+4                                                00240000
+         LA    1,BUFF                                                   00250000
+         ST    1,PARMS+8                                                00260000
+         LA    1,PCOUNT                                                 00270000
+         ST    1,PARMS+12                                               00280000
+         LA    1,PARMS            End loading params into PARMS         00290000
+         L     10,=V(BUILD)                                             00300001
+         BALR  14,10              Branch to Build                       00310000
+         LA    1,PARMS                                                  00320000
+         L     10,=V(PRINT)                                             00330000
+         BALR  14,10              Branch to Print                       00340000
+         LA    1,PARMS                                                  00341015
+         L     10,=V(TALLY)                                             00342015
+         BALR  14,10              Branch to Tally                       00343015
+         L     14,EXIT            Load exit location                    00350000
+         BR    14                 End program                           00360000
+         LTORG                    Literals are put here                 00370000
+         ORG   MAIN+(*-MAIN+15)/16*16                                   00380000
+TABLE    DS    70CL40                                                   00390000
+EOT      DS    F                                                        00400000
+BUFF     DS    84C                                                      00410000
+PCOUNT   DS    PL2'0'                                                   00420000
+PARMS    DS    4F'0'                                                    00430000
+SAVEM    DS    18F'0'                                                   00440000
+EXIT     DS    F                                                        00450000
+***************************************                                 00460000
+*                                                                       00470000
+*  Register usage:                                                      00480000
+*   15    DON'T USE                                                     00490000
+*   14    Exit                                                          00500000
+*   13    Save Area                                                     00510000
+*   1     Buffer                                                        00520000
+*   2     TABLE                                                         00530000
+*   3     Last Entry                                                    00540000
+*   4     Buffer                                                        00550000
+***************************************                                 00560000
+BUILD    CSECT                                                          00570000
+         STM   14,12,12(13)                                             00580000
+         LR    12,15                                                    00590000
+         USING BUILD,10           External register is R10              00600000
+         USING ENTRY,2            Table will use format ENTRY           00600104
+         LA    14,SAVEB                                                 00601000
+         ST    13,4(14)                                                 00602000
+         ST    14,8(13)                                                 00603000
+         LR    13,14                                                    00604000
+         LM    2,4,0(1)           Load parms                            00605000
+READ     XREAD 0(4),84            Read in an account                    00606000
+         BL    REND                                                     00607000
+         LA    1,0(4)                                                   00608000
+         MVC   FNAME(10),0(1)     First name                            00609000
+         LA    1,12(1)                                                  00609200
+         MVC   LNAME(10),0(1)     Last name                             00609300
+         LA    1,12(1)                                                  00609400
+         MVC   PASSWORD(8),0(1)   Password                              00609500
+         LA    1,10(1)                                                  00609600
+         MVC   ID(8),0(1)         ID                                    00609711
+         LA    1,11(1)                                                  00609800
+         MVC   EDATE(8),0(1)      Experation Date                       00609908
+         LA    1,10(1)                                                  00610000
+         MVC   BAL(7),0(1)       Save the balance into a temp var       00610108
+SKIP     DS    0H                                                       00610600
+         LA    2,32(2)                                                  00610700
+         B     READ               Back to top of loop                   00610800
+REND     DS    0H                                                       00610900
+         ST    2,0(3)                                                   00611000
+         L     13,4(13)                                                 00611100
+         LM    14,12,12(13)                                             00611200
+         BR    14                 End subroutine                        00611300
+         LTORG                    Literals are put here                 00611400
+         DC    C'*'                                                     00611500
+TEMP     DS    CL7' '                                                   00611600
+SAVEB    DS    18F'0'                                                   00611700
+***************************************                                 00650000
+*                                                                       00660000
+*  Register usage:                                                      00670000
+*   15    DON'T USE                                                     00680000
+*   14    EXIT                                                          00690000
+*   13    Save Area                                                     00700000
+*   1     Loacation of $                                                00710000
+*   2     Table                                                         00720000
+*   3     Last Entry                                                    00730000
+*   4     Buffer                                                        00740000
+*   5     Page Number                                                   00750000
+*   6     Counter                                                       00760000
+***************************************                                 00770000
+PRINT    CSECT                                                          00780000
+         STM   14,12,12(13)                                             00790000
+         LR    12,15                                                    00800000
+         USING PRINT,10           Use R10 as base register              00810000
+         USING ENTRY,2            Use ENTRY format for table            00811004
+         LM    2,5,0(1)           Load params into R3,R4, and R5        00820000
+         LA    14,SAVEC                                                 00830000
+         ST    13,4(14)                                                 00840000
+         ST    14,8(13)                                                 00850000
+         LR    13,14                                                    00860000
+         SR    6,6                Clear R6                              00861000
+PLOOP    DS    0H                                                       00862000
+         C     2,0(3)             Check if we are at the end of Table   00863000
+         BE    PEND               Branch to end                         00864000
+         C     6,=F'0'            Check if R6 = 0                       00865000
+         BNE   PSKIP              Skip if R6 != 0                       00866000
+         AP    0(2,5),=PL1'1'     Add one to page counter               00867000
+         MVC   PPNUM(4),=X'40202120' Format page number                 00868000
+         ED    PPNUM(4),0(5)      Format page number                    00869000
+         XPRNT PHEAD,81           Print page header                     00869100
+         XPRNT PHEADA,116         Print table header                    00869210
+         L     6,=F'5'            Load 5 into R6                        00869300
+PSKIP    DS    0H                                                       00869400
+         MVC   PFNAME(10),FNAME   Set first name                        00869500
+         MVC   PLNAME(10),LNAME   Set last name                         00869600
+         MVC   PPSW(8),PASSWORD   Set password                          00869700
+         MVC   PID(8),ID          Set ID                                00869800
+         MVC   PEDATE(10),EDATE   Set edate                             00869900
+         MVC   PBAL(10),BAL       Set Bal                               00870008
+         MVC   PT(2),=CL2'  '                                           00870600
+         BH    PPRINT                                                   00870800
+         MVC   PT(2),=CL2'CR'     If negitive set CR                    00870900
+PPRINT   XPRNT PLINE,110          Print Entry                           00871013
+         AP    PNUM(2),=PL1'1'    Add one to entry number               00871100
+         LA    2,32(0,2)          Advance table pointer                 00871312
+         S     6,=F'1'            Subtract one from R6                  00871400
+         B     PLOOP              To top of loop                        00871500
+PEND     DS    0H                                                       00871600
+         MVC   PPENDC(4),=X'40202020'                                   00871700
+         ED    PPENDC(4),PNUM     Format number of accounts             00871800
+         XPRNT PPEND,33           Print number of accounts              00871900
+         LA    1,PSENDS+6         Load address of $                     00872000
+         MVC   PSENDS(10),=X'4020206B2021204B2020'                      00872100
+         EDMK  PSENDS(10),PSUM    Format the Sum                        00872200
+         BCTR  1,0                                                      00872300
+         MVC   0(1,1),=CL1'$'     Add in $                              00872400
+         XPRNT PSEND,35           Print the Sum                         00872500
+         ZAP   PNTEMP(5),PSUM(4)  Psum is to small so we use PNTEMP     00872600
+         DP    PNTEMP(5),PNUM(2)  Divide the sum by the accounts        00872700
+         LA    1,PFENDT+6         Load address of $                     00872800
+         MVC   PFENDT(7),=X'402021204B2020'                             00872900
+         EDMK  PFENDT(7),PNTEMP   Format average                        00873000
+         BCTR  1,0                                                      00873100
+         MVC   0(1,1),=CL1'$'     Add $                                 00873200
+         XPRNT PFEND,35           Print average                         00873300
+         ZAP   PNUM(2),=PL1'0'    Zero out num                          00873400
+         ZAP   PSUM(4),=PL1'0'    Zero out sum                          00873500
+         L     13,4(13)                                                 00873600
+         LM    14,12,12(13)                                             00873700
+         BR    14                 End of subroutine                     00873800
+         LTORG                    Literals are put here                 00873900
+PHEAD    DC    CL50'1                    Familiar Names -- Client List' 00874000
+         DC    CL24'                    Page'                           00874100
+PPNUM    DS    CL4' '                                                   00874200
+PHEADA   DC    CL44'-First Name           Last Name             '       00874300
+         DC    CL44'Balance                  Password           '       00874410
+         DC    CL28'Exp.Date           ID Number'                       00874510
+PLINE    DC    CL1'0'                                                   00874600
+PFNAME   DS    10C' '                                                   00874700
+         DC    10C' '                                                   00874800
+PLNAME   DS    10C' '                                                   00874900
+         DC    10C' '                                                   00875000
+PBAL     DC    10C' '                                                   00875113
+         DC    10C' '                                                   00875213
+PPSW     DC    8C' '                                                    00875300
+         DC    10C' '                                                   00875400
+PEDATE   DC    10C' '                                                   00875513
+         DC    10C' '                                                   00875613
+PID      DS    8C' '                                                    00875700
+         DC    1C' '                                                    00876200
+PT       DS    2C' '                                                    00876300
+PPEND    DC    CL29'-Number of customers =      '                       00876400
+PPENDC   DS    4C' '                                                    00876500
+PSEND    DC    CL25'0Sum of all balances =   '                          00876600
+PSENDS   DS    10C' '                                                   00876700
+PFEND    DC    CL28'0Average balance =          '                       00876800
+PFENDT   DS    7C' '                                                    00876900
+PNUM     DC    PL2'0'                                                   00877000
+PNTEMP   DC    PL5'0'                                                   00877100
+PSUM     DC    PL4'0'                                                   00877200
+SAVEC    DS    18F'0'                                                   00877300
+***************************************                                 00877415
+*                                                                       00877515
+*  Register usage:                                                      00877615
+*   15 DON'T USE                                                        00877715
+*   14 EXIT                                                             00877815
+*   13 Save Area                                                        00877915
+*   2  Table                                                            00878015
+*   3  Last entry                                                       00879015
+***************************************                                 00880015
+TALLY    CSECT                                                          00890015
+         STM   14,12,12(13)                                             00900015
+         LR    12,15                                                    00910015
+         USING TALLY,10                                                 00920015
+         USING ENTRY,2                                                  00921015
+         LA    14,SAVED                                                 00922015
+         ST    13,4(14)                                                 00923015
+         ST    14,8(13)                                                 00924015
+         LR    13,14                                                    00925015
+         LM    2,5,0(1)           Load parms                            00926015
+*                                                                       00927015
+         L     13,4(13)                                                 00928015
+         LM    14,12,12(13)                                             00929015
+         BR    14                 End of subroutine                     00929115
+         LTORG                    Literals are put here                 00929215
+SAVED    DS    18F'0'                                                   00929315
+****************************************                                00929415
+         END   MAIN                                                     00930000
+/*                                                                      00940000
+//FT05F001  DD  DSN=KC02314.SUMMER18.CSCI360.HW6DATA,DISP=SHR           00950000
+//                                                                      00960000

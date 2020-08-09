@@ -1,0 +1,233 @@
+//KC03F62P JOB ,'Matthew Lord',MSGCLASS=H                               00010000
+//STEP1    EXEC  PGM=ASSIST                                             00020000
+//STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                    00030000
+//SYSPRINT   DD  SYSOUT=*                                               00040000
+//SYSIN      DD  *                                                      00050000
+********************************************************************    00060000
+*                                                                       00070000
+*  Program:     ASSIGN5                                                 00080000
+*  Programmer:  Matthew Lord                                            00090000
+*                                                                       00100000
+*  Register usage:                                                      00110000
+*    1        Param list/XDECI                                          00120000
+*    2        Buffer                                                    00130000
+*    10       Location in program when branched                         00140000
+*    13       Main save                                                 00150000
+*    14       Don't use                                                 00160000
+*    15       Base register                                             00170000
+********************************************************************    00180000
+MAIN     CSECT                                                          00190000
+         USING MAIN,15                                                  00200000
+         ST    14,EXIT      Save Exit Location                          00210000
+         LA    13,SAVEM     Set the save area                           00220000
+         LA    1,TABLE      Load the address of Table                   00230000
+         ST    1,PARMS      Store Table address in params               00240000
+         LA    1,EOT        Load address of end of table                00250000
+         ST    1,PARMS+4    Store end of table in params                00260000
+         LA    1,TABLELEN   Load the address of table length            00270000
+         ST    1,PARMS+8    Store the table length in params            00280000
+         LA    1,RESULT     Load address of results                     00290000
+         ST    1,PARMS+12   Store in params                             00300026
+         LA    1,PARMS      Address of params in R13                    00310000
+         L     10,=V(BUILD) Load external sub                           00320022
+         BALR  14,10        Branch to sub                               00330022
+         XPRNT PHEAD,15     Print the table head                        00331006
+         L     1,=F'1'      Load address of D0                          00332041
+         ST    1,PARMS+16     Store in params                           00333026
+         L     1,=F'5'      Load address of H0                          00334041
+         ST    1,PARMS+20     Store in params                           00335026
+         LA    1,PARMS      Set params to R1                            00340000
+         L     10,=V(PRINT) Load external sub                           00350022
+         BALR  14,10        Branch to sub                               00360022
+NOTDONE  XREAD BUFF,80      Read in line                                00370000
+         BL    DONE         Check if line exists                        00380000
+         XDECI 2,BUFF       Read number                                 00390000
+         BO    NOTDONE      Check if number exists                      00400000
+         C     2,=F'-44444444' check for seporator                      00410000
+         BNE   NOTDONE                                                  00420012
+         XREAD BUFF,80                                                  00421012
+         BL    DONE                                                     00422012
+         XDECI 2,BUFF                                                   00423012
+         BO    DONE                                                     00424012
+         ST    2,D1                                                     00425052
+         XDECI 2,0(1)                                                   00426012
+         BO    DONE                                                     00426147
+         ST    2,H1                                                     00427052
+         XREAD BUFF,80                                                  00427221
+         XDECI 2,BUFF                                                   00427321
+         BO    DONE                                                     00427421
+         ST    2,D2                                                     00427521
+         XDECI 2,0(1)                                                   00427621
+         ST    2,H3                                                     00427721
+         XREAD BUFF,80                                                  00427821
+         BL    DONE                                                     00427921
+         XDECI 2,BUFF                                                   00428021
+         BO    DONE                                                     00428121
+         ST    2,D3                                                     00428221
+         XDECI 2,0(1)                                                   00428321
+         ST    2,H3                                                     00428421
+DONE     DS    0H           End of NOTDONE                              00440000
+         XPRNT PHEAD2,16    Print out a heading                         00449706
+         L     1,=F'12'     Load address of D1                          00449854
+         ST    1,PARMS+16   Store in params                             00449946
+         L     1,=F'4'      Load address of H1                          00450054
+         ST    1,PARMS+20   Store in params                             00450146
+         LA    1,PARMS      Set params to R1                            00450254
+         L     10,=V(PRINT) Load external sub                           00450354
+         BALR  14,10        Branch to sub                               00450454
+         XPRNT PHEAD3,16                                                00450544
+         L     1,=F'10'                                                 00450655
+         ST    1,PARMS+16                                               00450755
+         L     1,=F'5'                                                  00450855
+         ST    1,PARMS+20                                               00450955
+         LA    1,PARMS                                                  00451055
+         L     10,=V(PRINT)                                             00451155
+         BALR  14,10                                                    00451255
+         XPRNT PHEAD4,16                                                00451344
+         L     1,=F'7'                                                  00451455
+         ST    1,PARMS+16                                               00451555
+         L     1,=F'7'                                                  00451655
+         ST    1,PARMS+20                                               00451755
+         LA    1,PARMS                                                  00451855
+         L     10,=V(PRINT)                                             00451955
+         BALR  14,10                                                    00452055
+         L     14,EXIT      Load exit location                          00453000
+         BR    14           End program                                 00460000
+         LTORG              Literals are put here                       00470000
+PHEAD    DC    CL15'1Table Contents'                                    00471006
+PHEAD2   DC    CL16'1Multiples of 12'                                   00472066
+PHEAD3   DC    CL16'1Multiples of 10'                                   00473066
+PHEAD4   DC    CL16'1Multiples of  7'                                   00474066
+TABLE    DS    75F'-64'                                                 00480000
+EOT      DS    0H                                                       00490000
+TABLELEN DS    F'0'                                                     00500000
+PARMS    DC    7F'0'                                                    00510007
+RESULT   DS    F'0'                                                     00520000
+SAVEM    DS    18F'0'                                                   00530000
+HMLINE   DC    CL14'Table Contents'                                     00540000
+BUFF     DS    80C' '                                                   00550000
+D1       DS    F'0'                                                     00553048
+H1       DS    F'0'                                                     00554048
+D2       DS    F'0'                                                     00555048
+H2       DS    F'0'                                                     00556048
+D3       DS    F'0'                                                     00557048
+H3       DS    F'0'                                                     00558048
+EXIT     DS    F                                                        00560000
+**********************************************************              00570000
+*                                                                       00580000
+*  Register usage:                                                      00590000
+*    1        Used by Params/XDECI                                      00600000
+*    2        Number in base10                                          00610000
+*    3        Table address                                             00620000
+*    4        EOT address                                               00630000
+*    5        Length of table address                                   00640000
+*    6        Counter                                                   00650000
+*   10        Base                                                      00660000
+*   13        Save Location                                             00670000
+*   14        return address                                            00680000
+*   15        Base register                                             00690000
+*                                                                       00700000
+**********************************************************              00710000
+BUILD    CSECT                                                          00720000
+         STM   14,12,12(13)                                             00730000
+         LR    12,15                                                    00740000
+         USING BUILD,10                                                 00750000
+         LM    3,5,0(1)    Load params into R3,R4, and R5               00760000
+         LA    14,SAVEB                                                 00770000
+         ST    13,4(14)                                                 00780002
+         ST    14,8(13)                                                 00790003
+         LR    13,14                                                    00800000
+         SR    6,6         Clear R6 to use as a counter                 00810000
+BLOOP    XREAD BUFFER,80   Read a line from the input file              00820000
+         BL    BEND        Check if read failed                         00830000
+         LA    1,BUFFER    Load the address of buffer into R1           00840000
+BLOOP1   XDECI 2,0(1)      Read number from read line                   00850005
+         BO    BLOOP       Check if read failes                         00860000
+         C     2,=F'-44444444'   Check for seporator                    00861005
+         BE    BEND        If it is equal end                           00862005
+         A     6,=F'1'     Add one to counter                           00870000
+         ST    2,0(3)      Store number in table                        00880005
+         LA    3,4(3)      Advance the table pointer                    00890005
+         CR    3,4         Compare the table pointer to the EOT         00900000
+         BE    BEND        If at EOT end build                          00910005
+         B     BLOOP1       Goto top of loop                            00920000
+BEND     DS    0H                                                       00930000
+         ST    6,0(5)     Store the number of elements                  00940002
+         L     13,4(13)                                                 00950002
+         LM    14,12,12(13)                                             00960000
+         BR    14           End subroutine                              00970000
+         LTORG              Literals are put here                       00980000
+BUFFER   DS    80C                                                      00990000
+         DC    C'*'                                                     01000000
+SAVEB    DS    18F'0'                                                   01010000
+******************************************************************      01020000
+*                                                                       01030000
+*  Register usage:                                                      01040000
+*    1        Used by XDECI/params                                      01050000
+*    2        Line string location                                      01060000
+*    3        Table address                                             01070000
+*    4        EOT address                                               01080000
+*    5        Length of table address                                   01090000
+*    6        Width counter                                             01100000
+*    8        Value from table                                          01110056
+*   10        Base                                                      01120000
+*   13        Save area                                                 01130000
+*   14        Don't use                                                 01140000
+*   15        Base register                                             01150000
+*                                                                       01160000
+*******************************************************************     01170000
+PRINT    CSECT                                                          01180000
+         STM   14,12,12(13)                                             01190000
+         LR    12,15                                                    01200000
+         USING PRINT,10                                                 01210004
+         LM    3,8,0(1)     Load params into R3,R4,R5,R6 and R7         01220027
+         LA    14,SAVEC                                                 01230000
+         ST    13,4(14)                                                 01240001
+         ST    14,8(13)                                                 01250001
+         LR    13,14                                                    01260000
+         ST    7,DIV                                                    01260143
+         ST    8,HOWMANY                                                01260243
+         L     5,0(5)       Load the lenght of the table                01280040
+PLOOP    L     6,HOWMANY    Counter for width of the table              01290042
+         LA    2,PLINE+1    Set R2 to the address of the print line     01300010
+         MVI   PLINE+1,C' ' Clear the print line                        01310000
+         MVC   PLINE+2(83),PLINE+1                                      01320000
+         C     5,=F'0'      Check if all values have been printed       01330000
+         BE    PEND                                                     01340000
+PLOOP1   C     5,=F'0'      Check if all values have been printed       01350000
+         BE    PEND1                                                    01360000
+         L     8,0(3)     Get current value from table                  01370056
+* Do div check here                                                     01371006
+         LR    9,8          Put R8 into R9                              01380258
+         M     8,=F'1'                                                  01380358
+         L     11,DIV                                                   01380459
+         DR    8,11                                                     01381059
+         C     8,=F'0'                                                  01382058
+         BNE   JUMP                                                     01383058
+         L     8,0(3)       Get current value from table                01384060
+         XDECO 8,TEMP       HEX to base 10                              01385060
+         MVC   0(12,2),TEMP Store base 10 num in print line             01390011
+         LA    2,12(2)     Advance print line pointer                   01400011
+         S     6,=F'1'      Decrement line width counter                01420058
+JUMP     LA    3,4(3)       Advance table pointer                       01421064
+         S     5,=F'1'      Decrement table length counter              01430064
+         C     6,=F'0'      Check if we have filled a line              01440000
+         BNE   PLOOP1       Goto top of loop1                           01450000
+         XPRNT PLINE,85     Print print line                            01460000
+         B     PLOOP        Goto top of loop                            01470000
+PEND1    XPRNT PLINE,85     Print printline                             01480000
+PEND     DS    0H                                                       01490000
+         L     13,4(13)                                                 01500001
+         LM    14,12,12(13)                                             01510000
+         BR    14           End of subroutine                           01520000
+         LTORG              Literals are put here                       01530000
+PLINE    DC    CL1'0'                                                   01550000
+         DS    CL84' '                                                  01560000
+TEMP     DS    CL12' '                                                  01570000
+SAVEC    DS    18F'0'                                                   01580000
+DIV      DS    F                                                        01581006
+HOWMANY  DS    F                                                        01582006
+         END   MAIN                                                     01590000
+/*                                                                      01591000
+//FT05F001  DD  DSN=KC02314.SUMMER18.CSCI360.HW5DATA,DISP=SHR           01600000
+//                                                                      01610000

@@ -1,0 +1,333 @@
+//KC03F62P JOB ,'Matthew Lord',MSGCLASS=H                               00010000
+//STEP1    EXEC  PGM=ASSIST                                             00020000
+//STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                    00030000
+//SYSPRINT   DD  SYSOUT=*                                               00040000
+//SYSIN      DD  *                                                      00050000
+**********************************************************************  00060000
+*                                                                       00070000
+*  Program:     ASSIGN7                                                 00080000
+*  Programmer:  Matthew Lord                                            00090000
+*                                                                       00100000
+**********************************************************************  00110000
+ENTRY    DSECT                    Format for the table                  00120000
+ID       DS    8C                                                       00130052
+FNAME    DS    10C                                                      00140000
+LNAME    DS    12C                                                      00150000
+SCORE1   DS    PL2                                                      00160000
+SCORE2   DS    PL2                                                      00170000
+SCORE3   DS    PL2                                                      00180000
+**********************************************************************  00190000
+*                                                                       00200000
+*  Register usage:                                                      00210000
+*  15   MAIN                                                            00220046
+*  14   Exit                                                            00230046
+*  13   Save location                                                   00240046
+*  10   Location to branch to                                           00241046
+*  1    Params                                                          00242046
+**********************************************************************  00250000
+MAIN     CSECT                                                          00260000
+         USING MAIN,15                                                  00270000
+         ST    14,EXIT            Save exit location                    00280000
+         LA    13,SAVEM           Set the save area                     00290000
+         LA    1,TABLE            Start loading params into PARMS       00300000
+         ST    1,PARMS                                                  00310000
+         LA    1,EOT                                                    00320000
+         ST    1,PARMS+4                                                00330000
+         LA    1,PARMS            End loading params into PARMS         00360000
+         L     10,=V(BUILD)                                             00370000
+         BALR  14,10              Branch to build                       00380000
+         LA    1,HEAD                                                   00381046
+         ST    1,PARMS+8                                                00382046
+         LA    1,PARMS                                                  00383046
+         L     10,=V(PRINT)                                             00384046
+         BALR  14,10              Branch to print                       00385046
+         LA    1,PARMS                                                  00386057
+         L     10,=V(TRANS)                                             00387057
+         BALR  14,10              Branch to trans                       00388057
+         LA    1,HEADA                                                  00388165
+         ST    1,PARMS+8                                                00388263
+         LA    1,PARMS                                                  00389057
+         L     10,=V(PRINT)                                             00390057
+         BALR  14,10              Branch to print                       00391057
+         L     14,EXIT            Load exit location                    00400000
+         BR    14                 Exit program                          00410000
+         LTORG                    Literals are put here                 00420000
+         ORG   MAIN+(*-MAIN+31)/32*32                                   00430002
+TABLE    DS    70CL40                                                   00440001
+EOT      DS    F                                                        00450001
+PARMS    DS    4F'0'                                                    00470001
+HEAD     DC    CL40'1                 Initial Table Contents'           00471046
+         DC    CL22'             Page     '                             00472046
+HEADA    DC    CL42'1                 Table After Transactions'         00473063
+         DC    CL22'             Page     '                             00474064
+SAVEM    DS    18F'0'                                                   00480001
+EXIT     DS    F                                                        00490001
+*********************************************************************   00500000
+*                                                                       00510000
+*  Register usage:                                                      00520000
+*   15    DON'T USE                                                     00530046
+*   14    EXIT                                                          00540046
+*   13    Save Area                                                     00550046
+*    8    Location of EOT                                               00551046
+*    4    Lenght of item in the buff                                    00552046
+*    3    Location of end of item in buff                               00553046
+*    1    Location of params                                            00554046
+*********************************************************************   00560000
+BUILD    CSECT                                                          00570000
+         STM   14,12,12(13)                                             00580000
+         LR    12,15                                                    00590000
+         USING BUILD,10           External register is R10              00600038
+         LA    14,SAVEB                                                 00620000
+         ST    13,4(14)                                                 00630000
+         ST    14,8(13)                                                 00640000
+         LR    13,14                                                    00650000
+         LM    7,8,0(1)                                                 00660038
+         USING ENTRY,7                                                  00661038
+READ     XREAD BUFF,80            Read a line                           00670000
+         BL    REND               If end of file, goto END              00680042
+         LA    1,BUFF                                                   00690041
+* Get ID                                                                00691000
+         MVC   ID(12),0(1)        Copy 8 characters into ID             00692044
+         CLC   ID(8),=CL8'00000000'                                     00692145
+         BE    REND               If they are equal go to REND          00692250
+* Get First Name                                                        00781000
+         TRT   0(80,1),SCANTAB    Set R1 to first blank                 00790038
+         BZ    READ               If the search fails, goto REND        00800042
+         LR    3,1                                                      00800142
+         TRT   0(80,1),SPACES     Set R1 to first non-blank             00801038
+         LR    4,1                                                      00802142
+         SR    4,3                                                      00802242
+         BCTR  4,0                                                      00802342
+         EX    4,EFNAME                                                 00802442
+         TR    FNAME(10),LOWTAB   Set first character to uppercase      00803042
+         TR    FNAME(3),HIGHTAB                                         00804057
+* Getting Last name                                                     00881000
+         TRT   0(80,1),SCANTAB    Set R1 to first blank                 00890038
+         BZ    READ               If the search failes, goto REND       00900042
+         LR    3,1                                                      00900142
+         TRT   0(80,1),SPACES     Set R1 to first non-blank             00901038
+         LR    4,1                                                      00902142
+         SR    4,3                                                      00902242
+         BCTR  4,0                                                      00902342
+         EX    4,ELNAME                                                 00902442
+         TR    LNAME(12),LOWTAB                                         00902542
+         TR    LNAME(3),HIGHTAB                                         00902657
+* Get Score 1                                                           00990000
+         TRT   0(80,1),SCANTAB   Set R1 to first blank                  00991038
+         BZ    REND               If search fails, goto REND            00992027
+         LR    3,1                                                      00992142
+         TRT   0(80,1),SPACES     Set R1 to first non-blank             00993038
+         LR    4,1                Make copy of R1                       00994042
+         SR    4,3                R6 is now length of Score 1           00999042
+         BCTR  4,0                Subtract 1 from length                00999142
+         EX    4,ENUM             Branch to ENUM                        00999242
+* Get Score 2                                                           00999427
+         TRT   0(80,1),SCANTAB    Set R1 to first blank                 00999538
+         BZ    REND               If search fails, goto REND            00999627
+         LR    3,1                                                      00999742
+         TRT   0(80,1),SPACES      Set R1 to first non-blank            00999838
+         LR    4,1                Make copy of R1                       01000042
+         SR    4,3                R6 is now length of Score 2           01030042
+         BCTR  4,0                Subtract 1 from length                01040042
+         EX    4,ENUMM            Branch to ENUMM                       01050042
+* Get Score 3                                                           01070027
+         TRT   0(80,1),SCANTAB    Set R1 to first blank                 01071042
+         BZ    REND               If search fails, goto REND            01072027
+         TRT   0(80,1),SPACES      Set R1 to first non-blank            01073042
+         LR    4,1                Make copy of R1                       01074042
+         SR    4,3                R6 is now lenght of Score 3           01079042
+         BCTR  4,0                Subtract 1 from length                01079142
+         EX    4,ENUMMM           Branch to ENUMMM                      01079242
+         LA    7,40(0,7)                                                01280043
+         B     READ               Back to READ                          01281027
+REND     ST    7,0(0,8)           Store EOT                             01282042
+         L     13,4(13)                                                 01300000
+         LM    14,12,12(13)                                             01310000
+         BR    14                 End subroutine                        01320000
+         LTORG                    Literals are put here                 01330000
+BUFF     DS    80C                                                      01400027
+TEMPK    DS    PL2                                                      01411027
+EFNAME   MVC   FNAME(10),0(1)                                           01411142
+ELNAME   MVC   LNAME(12),0(1)                                           01411242
+ENUM     PACK  SCORE1(2),0(0,3)                                         01412038
+ENUMM    PACK  SCORE2(2),0(0,3)                                         01412138
+ENUMMM   PACK  SCORE3(2),0(0,3)                                         01412238
+SCANTAB  DC    256X'00'                                                 01422000
+         ORG   SCANTAB+C'A'                                             01430000
+         DC    9X'01'                                                   01440000
+         ORG                                                            01450000
+         ORG   SCANTAB+C'J'                                             01460000
+         DC    9X'01'                                                   01470000
+         ORG                                                            01480000
+         ORG   SCANTAB+C'S'                                             01490000
+         DC    8X'01'                                                   01500000
+         ORG                                                            01510000
+         ORG   SCANTAB+C'a'                                             01520000
+         DC    9X'01'                                                   01530000
+         ORG                                                            01540000
+         ORG   SCANTAB+C'j'                                             01550000
+         DC    9X'01'                                                   01560000
+         ORG                                                            01570000
+         ORG   SCANTAB+C's'                                             01580000
+         DC    9X'01'                                                   01590000
+         ORG                                                            01600000
+         ORG   SCANTAB+C'0'                                             01610000
+         DC    10X'01'                                                  01620000
+         ORG                                                            01630000
+SPACES   DC    256X'00'                                                 01640000
+         ORG   SPACES+X'40'                                             01650000
+         DC    X'01'                                                    01660000
+         ORG                                                            01670000
+LOWTAB   DC    256C' '                                                  01680000
+         ORG   LOWTAB+C'a'                                              01690000
+         DC    CL9'abcdefghi'                                           01700001
+         ORG                                                            01710000
+         ORG   LOWTAB+C'j'                                              01720000
+         DC    CL9'jklmnopqr'                                           01730000
+         ORG                                                            01740000
+         ORG   LOWTAB+C's'                                              01750000
+         DC    CL8'stuvwxyz'                                            01760000
+         ORG                                                            01770000
+         ORG   LOWTAB+C'A'                                              01780000
+         DC    CL9'abcdefghi'                                           01790000
+         ORG                                                            01800000
+         ORG   LOWTAB+C'J'                                              01810000
+         DC    CL9'jklmnopqr'                                           01820000
+         ORG                                                            01830000
+         ORG   LOWTAB+C'S'                                              01840000
+         DC    CL8'stuvwxyz'                                            01850000
+         ORG                                                            01860000
+         ORG   LOWTAB+C'0'                                              01870000
+         DC    CL10'0123456789'                                         01880000
+         ORG                                                            01890000
+HIGHTAB  DC    256C' '                                                  01900000
+         ORG   HIGHTAB+C'a'                                             01910000
+         DC    CL9'ABCDEFGHI'                                           01920000
+         ORG                                                            01930000
+         ORG   HIGHTAB+C'j'                                             01940000
+         DC    CL9'JKLMNOPQR'                                           01950000
+         ORG                                                            01960000
+         ORG   HIGHTAB+C's'                                             01970000
+         DC    CL9'STUVWXYZ'                                            01980000
+         ORG                                                            01990000
+         ORG   HIGHTAB+C'A'                                             02000000
+         DC    CL9'ABCDEFGHI'                                           02010000
+         ORG                                                            02020000
+         ORG   HIGHTAB+C'J'                                             02030000
+         DC    CL9'JKLMNOPQR'                                           02040000
+         ORG                                                            02050000
+         ORG   HIGHTAB+C'S'                                             02060000
+         DC    CL9'STUVWXYZ'                                            02070000
+         ORG                                                            02080000
+         ORG   HIGHTAB+C'0'                                             02090000
+         DC    CL10'0123456789'                                         02100000
+         ORG                                                            02110000
+SAVEB    DS    18F'0'                                                   02120000
+         DROP  7                                                        02121039
+*********************************************************************   02130000
+*                                                                       02131046
+*  Register usage:                                                      02132046
+*   15    DON'T USe                                                     02133046
+*   14    EXIT                                                          02134046
+*   13    Save Area                                                     02135046
+*   9     Location of page header                                       02136046
+*   8     Location of EOT                                               02137046
+*   7     Table pointer                                                 02138046
+*   6     counter                                                       02139046
+*********************************************************************   02139146
+PRINT    CSECT                                                          02139246
+         STM   14,12,12(13)                                             02139346
+         LR    12,15                                                    02139446
+         USING PRINT,10           Use R10 as base register              02139546
+         LM    7,9,0(1)                                                 02139646
+         LA    14,SAVEC                                                 02139746
+         ST    13,4(14)                                                 02139846
+         ST    14,8(13)                                                 02139946
+         LR    13,14                                                    02140046
+         USING ENTRY,7                                                  02140146
+         L     6,=F'0'                                                  02140246
+PLOOP    C     7,0(0,8)                                                 02140346
+         BE    PEND                                                     02140446
+         C     6,=F'0'            Check counter                         02140546
+         BE    PHEADER            Print header if true                  02140646
+CONT     MVC   PID(8),ID          Set ID                                02140746
+         MVC   PFNAME(10),FNAME   Set first name                        02140846
+         MVC   PLNAME(12),LNAME   Set last name                         02140946
+         MVC   PSCORE1(4),=X'40202020' Format for score one             02141046
+         ED    PSCORE1(4),SCORE1  Set score 1                           02141146
+         MVC   PSCORE2(4),=X'40202020' Format for score two             02141246
+         ED    PSCORE2(4),SCORE2  Set score 2                           02141346
+         MVC   PSCORE3(4),=X'40202020' Format for score three           02141446
+         ED    PSCORE3(4),SCORE3  Set score 3                           02141546
+         XPRNT PLINE,61           Print a line                          02141654
+         LA    7,40(0,7)          Advance pointer                       02141746
+         S     6,=F'1'                                                  02141846
+         B     PLOOP                                                    02141946
+PHEADER  L     6,=F'18'           Set counter to 18                     02142047
+         MVC   65(4,9),=X'40202020'  format page number                 02142146
+         ED    65(4,9),PCOUNT     Set page number                       02142246
+         XPRNT 0(9),69            Print page header                     02142346
+         XPRNT PHEAD,69           Print table header                    02142446
+         AP    PCOUNT,=PL1'1'     Add one to page count                 02142546
+         B     CONT                                                     02142648
+PEND     L     13,4(13)                                                 02142746
+         LM    14,12,12(13)                                             02142846
+         BR    14                                                       02142946
+         LTORG                    Literals are put here                 02143046
+PHEAD    DC    CL37'-ID Number    Last Name    First Name'              02143146
+         DC    CL32'    Score1     Score2     Score3'                   02143246
+PCOUNT   DC    PL2'1'                                                   02143346
+PLINE    DC    C' '                                                     02143446
+PID      DC    8C' '                                                    02143546
+         DC    2C' '                                                    02143646
+PLNAME   DC    12C' '                                                   02143751
+         DC    4C' '                                                    02143854
+PFNAME   DC    10C' '                                                   02143951
+         DC    4C' '                                                    02144054
+PSCORE1  DC    4C' '                                                    02144146
+         DC    4C' '                                                    02144246
+PSCORE2  DC    4C' '                                                    02144346
+         DC    4C' '                                                    02144446
+PSCORE3  DC    4C' '                                                    02144546
+SAVEC    DS    18F'0'                                                   02144746
+**********************************************************************  02144857
+*                                                                       02144957
+*                                                                       02145057
+*  Register usage:                                                      02145157
+*    15   DON'T USE                                                     02145257
+*    14   EXIT                                                          02145357
+*    13   Save area                                                     02145457
+*    2    TABLE                                                         02145557
+*    3    Last entry                                                    02145657
+*    4    buffer                                                        02145757
+*    5    Page number                                                   02145857
+*    6    Start of the table                                            02145957
+**********************************************************************  02146057
+TRANS    CSECT                                                          02146157
+         STM   14,12,12(13)                                             02146257
+         LR    12,15                                                    02146357
+         USING TRANS,10                                                 02146457
+         USING ENTRY,2                                                  02146557
+         LA    14,SAVED                                                 02146657
+         ST    13,4(14)                                                 02146757
+         ST    14,8(13)                                                 02146857
+         LR    13,14                                                    02146957
+         LM    2,5,0(1)                                                 02147057
+*         LR    6,2                Save the start of the table in R6    02147162
+         XPRNT THEAD,94           print page header                     02147557
+*TLOOP    XREAD 0(4),80            Read in tran                         02147762
+*         BL    TEND               End if nothing                       02147862
+*         LR    2,6                Reset r2 pointer                     02147962
+*TEND     DS    0H                                                      02148062
+         L     13,4(13)                                                 02148159
+         LM    14,12,12(13)                                             02148259
+         BR    14                                                       02148359
+         LTORG                                                          02148459
+SAVED    DS    18F'0'                                                   02148557
+TPAGE    DS    4C' '                                                    02148657
+THEAD    DC    CL47'1                                    Result of '    02148757
+         DC    CL47'Transactions                             Page: '    02148857
+         END   MAIN                                                     02149000
+/*                                                                      02150000
+//FT05F001  DD  DSN=KC02314.SUMMER18.CSCI360.HW7DATA,DISP=SHR           02160000
+//                                                                      02170000

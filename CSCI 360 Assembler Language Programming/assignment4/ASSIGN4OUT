@@ -1,0 +1,246 @@
+1                    J E S 2  J O B  L O G  --  S Y S T E M  S 0 W 1  --  N O D E  Z O S K C T R         
+0 
+ 18.38.57 JOB00740 ---- WEDNESDAY, 11 JUL 2018 ----
+ 18.38.57 JOB00740  IRR010I  USERID KC03F62  IS ASSIGNED TO THIS JOB.
+ 18.38.57 JOB00740  ICH70001I KC03F62  LAST ACCESS AT 18:22:56 ON WEDNESDAY, JULY 11, 2018
+ 18.38.57 JOB00740  $HASP373 KC03F62P STARTED - INIT 2    - CLASS A        - SYS S0W1
+ 18.38.57 JOB00740  -                                         --TIMINGS (MINS.)--            ----PAGING COUNTS---
+ 18.38.57 JOB00740  -JOBNAME  STEPNAME PROCSTEP    RC   EXCP    TCB    SRB  CLOCK   SERV  PG   PAGE   SWAP    VIO SWAPS
+ 18.38.57 JOB00740  -KC03F62P                      00     70 ******    .00     .0    222   0      0      0      0     0
+ 18.38.57 JOB00740  -KC03F62P ENDED.  NAME-Matthew Lord         TOTAL TCB CPU TIME=   .00  TOTAL ELAPSED TIME=    .0
+ 18.38.57 JOB00740  $HASP395 KC03F62P ENDED
+0------ JES2 JOB STATISTICS ------
+-  11 JUL 2018 JOB EXECUTION DATE
+-          168 CARDS READ
+-          246 SYSOUT PRINT RECORDS
+-            0 SYSOUT PUNCH RECORDS
+-           26 SYSOUT SPOOL KBYTES
+-         0.00 MINUTES EXECUTION TIME
+         1 //KC03F62P JOB ,'Matthew Lord',MSGCLASS=H                               JOB00740
+         2 //STEP1    EXEC  PGM=ASSIST                                             00020000
+         3 //STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                    00030000
+         4 //SYSPRINT   DD  SYSOUT=*                                               00040000
+         5 //SYSIN      DD  *                                                      00050000
+         6 //FT05F001  DD  DSN=KC02314.SUMMER18.CSCI360.HW4DATA,DISP=SHR           01670000
+         7 //FT06F001   DD SYSOUT=*                                                01680000
+ ICH70001I KC03F62  LAST ACCESS AT 18:22:56 ON WEDNESDAY, JULY 11, 2018
+ IEF236I ALLOC. FOR KC03F62P STEP1
+ IGD103I SMS ALLOCATED TO DDNAME STEPLIB
+ IEF237I JES2 ALLOCATED TO SYSPRINT
+ IEF237I JES2 ALLOCATED TO SYSIN
+ IGD103I SMS ALLOCATED TO DDNAME FT05F001
+ IEF237I JES2 ALLOCATED TO FT06F001
+ IEF142I KC03F62P STEP1 - STEP WAS EXECUTED - COND CODE 0000
+ IGD104I KC02293.ASSIST.LOADLIB                       RETAINED,  DDNAME=STEPLIB 
+ IEF285I   KC03F62.KC03F62P.JOB00740.D0000102.?         SYSOUT        
+ IEF285I   KC03F62.KC03F62P.JOB00740.D0000101.?         SYSIN         
+ IGD104I KC02314.SUMMER18.CSCI360.HW4DATA             RETAINED,  DDNAME=FT05F001
+ IEF285I   KC03F62.KC03F62P.JOB00740.D0000103.?         SYSOUT        
+ IEF373I STEP/STEP1   /START 2018192.1838
+ IEF032I STEP/STEP1   /STOP  2018192.1838 
+         CPU:     0 HR  00 MIN  00.01 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+         VIRT:   584K  SYS:   272K  EXT:        4K  SYS:    11432K
+         ATB- REAL:                     0K  SLOTS:                     0K
+              VIRT- ALLOC:       0M SHRD:       0M
+ IEF375I  JOB/KC03F62P/START 2018192.1838
+ IEF033I  JOB/KC03F62P/STOP  2018192.1838 
+         CPU:     0 HR  00 MIN  00.01 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+1*** ASSIST 4.0/A2-05/15/82  470/V7A/0:OS/VS2  INS=SDFP7/X=BGHO, CHECK/TRC/=1180, OPTS=CDKMPR FROM PENN ST*NIU COMPSCI*LT         
+0                                                                                                                                 
+0                                                                                                               PAGE    1         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                       1 ************************************************************            00060000         
+                                       2 *                                                                       00070000         
+                                       3 *  Program:    ASSIGN4                                                  00080000         
+                                       4 *  Programmer: Matthew Lord                                             00090000         
+                                       5 *                                                                       00100000         
+                                       6 *  Register usage:                                                      00110000         
+                                       7 *    1        Used by XDECI                                             00120000         
+                                       8 *   10        Location in program when branched                         00130001         
+                                       9 *   13        Location of params                                        00140001         
+                                      10 *   14        DON'T USE                                                 00150001         
+                                      11 *   15        Base register                                             00160000         
+                                      12 ************************************************************            00170000         
+ 000000                               13 MAIN     CSECT                                                          00180000         
+ 000000                               14          USING MAIN,15                                                  00190000         
+ 000000 41D0 F15C            0015C    15          LA    13,TABLE     Load the address of Table                   00200000         
+ 000004 50D0 F2B8            002B8    16          ST    13,PARMS     Store Table address in params               00210000         
+ 000008 41D0 F24C            0024C    17          LA    13,EOT       Load address of end of table                00220000         
+ 00000C 50D0 F2BC            002BC    18          ST    13,PARMS+4   Store end of table in params                00230000         
+ 000010 41D0 F24C            0024C    19          LA    13,TABLELEN  Load the address of table length            00240000         
+ 000014 50D0 F2C0            002C0    20          ST    13,PARMS+8   Store the table lenght in params            00250000         
+ 000018 41D0 F2B8            002B8    21          LA    13,PARMS     Address of params in R13                    00260001         
+ 00001C 45A0 F02A            0002A    22          BAL   10,BUILD     Build table                                 00270000         
+ 000020 45A0 F062            00062    23          BAL   10,PRINT     Print all numbers                           00280000         
+ 000024 45A0 F0CA            000CA    24          BAL   10,ODDS      Print all odd numbers                       00290001         
+ 000028 07FE                          25          BR    14           End Program                                 00300000         
+                                      26 ***********************************                                     00310000         
+                                      27 *                                                                       00320000         
+                                      28 *  Register usage:                                                      00330000         
+                                      29 *    1        Used by XDECI                                             00340000         
+                                      30 *    2        Number in base10                                          00350000         
+                                      31 *    3        Table address                                             00360000         
+                                      32 *    4        EOT address                                               00370000         
+                                      33 *    5        Length of table address                                   00380000         
+                                      34 *    6        Counter                                                   00390000         
+                                      35 *   10        Return address                                            00400000         
+                                      36 *   13        Params                                                    00410001         
+                                      37 *   14        DON'T USE                                                 00420001         
+                                      38 *   15        Base register                                             00430000         
+                                      39 *                                                                       00440000         
+                                      40 ***********************************                                     00450000         
+ 00002A                               41 BUILD    DS    0H           Start build subroutine                      00460000         
+ 00002A 1B66                          42          SR    6,6          Clear R6 to use as a counter                00470001         
+ 00002C 9835 D000            00000    43          LM    3,5,0(13)    Load params into R3,R4, and R5              00480000         
+ 000030 E000 F30D 0050 0030D          44 BLOOP    XREAD BUFFER,80    Read a line from the input file             00490000         
+ 000036 4740 F05C            0005C    45          BL    BEND         Check if read failed                        00500000         
+ 00003A 4110 F30D            0030D    46          LA    1,BUFFER     Load the address of buffer into R1          00510000         
+ 00003E 5320 1000            00000    47 BLOOP1   XDECI 2,0(0,1)     Read number from read line                  00520000         
+ 000042 4710 F030            00030    48          BO    BLOOP        Check if read failes                        00530000         
+ 000046 5A60 F148            00148    49          A     6,=F'1'      Add one to counter                          00540000         
+ 00004A 5020 3000            00000    50          ST    2,0(0,3)     Store number in table                       00550000         
+ 00004E 4130 3004            00004    51          LA    3,4(0,3)     Advance the table pointer                   00560000         
+ 000052 1934                          52          CR    3,4          Compare the table pointer to the EOT        00570000         
+1                                                                                                               PAGE    2         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+ 000054 4780 F05C            0005C    53          BE    BEND         If at EOT end build                         00580000         
+ 000058 47F0 F03E            0003E    54          B     BLOOP1       Goto top of loop                            00590000         
+ 00005C 5060 5000            00000    55 BEND     ST    6,0(0,5)     Store the number of elements                00600000         
+ 000060 07FA                          56          BR    10           End subroutine                              00610000         
+                                      57 ***********************************                                     00620000         
+                                      58 *                                                                       00630000         
+                                      59 *  Register usage:                                                      00640000         
+                                      60 *    1        Used by XDECI                                             00650000         
+                                      61 *    2        Line string location                                      00660000         
+                                      62 *    3        Table address                                             00670000         
+                                      63 *    4        EOT address                                               00680000         
+                                      64 *    5        Length of table address                                   00690000         
+                                      65 *    6        Width counter                                             00700000         
+                                      66 *    7        Value from table                                          00710000         
+                                      67 *   10        Return address                                            00720000         
+                                      68 *   13        Params                                                    00730001         
+                                      69 *   14        DONT USE                                                  00740000         
+                                      70 *   15        Base register                                             00750000         
+                                      71 *                                                                       00760000         
+                                      72 ************************************                                    00770000         
+ 000062                               73 PRINT    DS    0H           Start of subroutine                         00780000         
+ 000062 E020 F250 002C 00250          74          XPRNT PHEAD,44     Print the table head                        00790000         
+ 000068 9835 D000            00000    75          LM    3,5,0(13)    Load params into R3,R4, and R5              00800000         
+ 00006C 5850 5000            00000    76          L     5,0(0,5)     Load the lenght of the table                00810000         
+ 000070 5860 F14C            0014C    77 PLOOP    L     6,=F'5'      Counter for width of table                  00820001         
+ 000074 4120 F2C5            002C5    78          LA    2,PLINE+1    Set R2 to the address of the print line     00830000         
+ 000078 9240 F2C5      002C5          79          MVI   PLINE+1,C' ' Clear the print line                        00840000         
+ 00007C D246 F2C6 F2C5 002C6 002C5    80          MVC   PLINE+2(71),PLINE+1                                      00850001         
+ 000082 5950 F150            00150    81          C     5,=F'0'      Check if all values have been printed       00860000         
+ 000086 4780 F0C8            000C8    82          BE    PEND         End if true                                 00870000         
+ 00008A 5950 F150            00150    83 PLOOP1   C     5,=F'0'      Check if all values have been printed       00880000         
+ 00008E 4780 F0C2            000C2    84          BE    PEND1        End if true                                 00890000         
+ 000092 5870 3000            00000    85          L     7,0(0,3)     Get current value from table                00900000         
+ 000096 5270 F2AC            002AC    86          XDECO 7,TEMP       Hex to base 10                              00910000         
+ 00009A D20B 2000 F2AC 00000 002AC    87          MVC   0(12,2),TEMP Store base 10 num in print line             00920000         
+ 0000A0 4120 200C            0000C    88          LA    2,12(0,2)    Advance print line pointer                  00930000         
+ 0000A4 4130 3004            00004    89          LA    3,4(0,3)     Advance table pointer                       00940000         
+ 0000A8 5B50 F148            00148    90          S     5,=F'1'      Decrement table length counter              00950000         
+ 0000AC 5B60 F148            00148    91          S     6,=F'1'      Decrement line width counter                00960000         
+ 0000B0 5960 F150            00150    92          C     6,=F'0'      Check if we have filled a line              00970000         
+ 0000B4 4770 F08A            0008A    93          BNE   PLOOP1       Goto top of loop1                           00980000         
+ 0000B8 E020 F2C4 0049 002C4          94          XPRNT PLINE,73     Print print line                            00990000         
+ 0000BE 47F0 F070            00070    95          B     PLOOP        Goto top of loop                            01000000         
+ 0000C2 E020 F2C4 0049 002C4          96 PEND1    XPRNT PLINE,73     Print printline                             01010000         
+ 0000C8 07FA                          97 PEND     BR    10           End of subroutine                           01020000         
+                                      98 ***********************************                                     01030000         
+                                      99 *                                                                       01040000         
+                                     100 *  Register usage:                                                      01050000         
+                                     101 *    1        Used by XDECI                                             01060000         
+                                     102 *    2        Line string location                                      01070000         
+                                     103 *    3        Table address                                             01080000         
+                                     104 *    4        EOT address                                               01090000         
+                                     105 *    5        Length of table address                                   01100000         
+                                     106 *    6        Table Var                                                 01110000         
+                                     107 *    7        Used in division                                          01120001         
+                                     108 *    8        Width counter                                             01130000         
+                                     109 *   10        Return address                                            01140000         
+1                                                                                                               PAGE    3         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                     110 *   13        Params                                                    01150001         
+                                     111 *   14        DON'T USE                                                 01160001         
+                                     112 *   15        Base register                                             01170000         
+                                     113 *                                                                       01180000         
+                                     114 ***********************************                                     01190000         
+ 0000CA                              115 ODDS     DS    0H           Start of subroutine                         01200001         
+ 0000CA E020 F27C 0030 0027C         116          XPRNT OHEAD,48     Print table head                            01210000         
+ 0000D0 9835 D000            00000   117          LM    3,5,0(13)    Load params into R3,R4, and R5              01220000         
+ 0000D4 5850 5000            00000   118          L     5,0(0,5)     Load lenght of table                        01230000         
+ 0000D8 5880 F154            00154   119 OLOOP    L     8,=F'6'      Table width counter                         01240001         
+ 0000DC 4120 F2C5            002C5   120          LA    2,PLINE+1    Load pointer to print line                  01250000         
+ 0000E0 9240 F2C5      002C5         121          MVI   PLINE+1,C' ' Clear print line                            01260000         
+ 0000E4 D246 F2C6 F2C5 002C6 002C5   122          MVC   PLINE+2(71),PLINE+1                                      01270000         
+ 0000EA 5950 F150            00150   123          C     5,=F'0'      Check if we have printed the table          01280000         
+ 0000EE 4780 F144            00144   124          BE    OEND         Goto end of subroutine if true              01290000         
+ 0000F2 5950 F150            00150   125 OLOOP1   C     5,=F'0'      Check if we have printed the table          01300000         
+ 0000F6 4780 F13E            0013E   126          BE    OEND1        Goto end if true                            01310000         
+ 0000FA 5870 3000            00000   127          L     7,0(0,3)     Load the current number                     01320000         
+ 0000FE 5B50 F148            00148   128          S     5,=F'1'      Decrement table length                      01330000         
+ 000102 5C60 F148            00148   129          M     6,=F'1'      Check if odd                                01340000         
+ 000106 5D60 F158            00158   130          D     6,=F'2'      Check if odd                                01350000         
+ 00010A 5960 F150            00150   131          C     6,=F'0'      Check if odd                                01360000         
+ 00010E 4780 F128            00128   132          BE    SKIP         Skip printing if odd                        01370000         
+ 000112 5860 3000            00000   133          L     6,0(0,3)     Load the current number                     01380000         
+ 000116 5260 F2AC            002AC   134          XDECO 6,TEMP       Hex to Dec                                  01390000         
+ 00011A D20B 2000 F2AC 00000 002AC   135          MVC   0(12,2),TEMP Store Dec in print line                     01400000         
+ 000120 4120 200C            0000C   136          LA    2,12(0,2)    Advance print line pointer                  01410000         
+ 000124 5B80 F148            00148   137          S     8,=F'1'      Decrement line counter                      01420000         
+ 000128 4130 3004            00004   138 SKIP     LA    3,4(0,3)     Advance table pointer                       01430000         
+ 00012C 5980 F150            00150   139          C     8,=F'0'      Check if Pline is full                      01440001         
+ 000130 4770 F0F2            000F2   140          BNE   OLOOP1       Goto top of loop1                           01450000         
+ 000134 E020 F2C4 0049 002C4         141          XPRNT PLINE,73     Print print line                            01460000         
+ 00013A 47F0 F0D8            000D8   142          B     OLOOP        Goto top of loop                            01470000         
+ 00013E E020 F2C4 0049 002C4         143 OEND1    XPRNT PLINE,73     Print print line                            01480000         
+ 000144 07FA                         144 OEND     BR    10           End of subroutine                           01490000         
+                                     145 ***********************************                                     01500000         
+                                     146          LTORG                Literals are put here                     01510000         
+ 000148 00000001                     147                =F'1'                                                                     
+ 00014C 00000005                     148                =F'5'                                                                     
+ 000150 00000000                     149                =F'0'                                                                     
+ 000154 00000006                     150                =F'6'                                                                     
+ 000158 00000002                     151                =F'2'                                                                     
+ 00015C                              152 TABLE    DS    60F'-8'                                                  01520000         
+ 00024C                              153 EOT      DS    0H                                                       01530000         
+ 00024C                              154 TABLELEN DS    F'0'                                                     01540000         
+ 000250 F140404040404040             155 PHEAD    DC    CL44'1                            List of Numbers'       01550000         
+ 00027C F140404040404040             156 OHEAD    DC    CL48'1                            List of Odd Numbers'   01560000         
+ 0002AC                              157 TEMP     DS    CL12' '                                                  01570000         
+ 0002B8                              158 PARMS    DS    F'0'                                                     01580000         
+ 0002BC                              159          DS    F'0'                                                     01590000         
+ 0002C0                              160          DS    F'0'                                                     01600000         
+ 0002C4 F0                           161 PLINE    DC    CL1'0'                                                   01610000         
+ 0002C5                              162          DS    CL72' '                                                  01620000         
+ 00030D                              163 BUFFER   DS    80C                                                      01630000         
+ 00035D 5C                           164          DC    C'*'                                                     01640000         
+                                     165          END   MAIN                                                     01650000         
+0***  NO   STATEMENTS FLAGGED -  NO   WARNINGS,  NO   ERRORS                                                                      
+0*** DYNAMIC CORE AREA USED:  LOW:    9624 HIGH:     896 LEAVING:  483048 FREE BYTES. AVERAGE:       63 BYTES/STMT ***            
+1*** ASSEMBLY TIME =    0.001 SECS,   166000 STATEMENTS/SEC ***                                                                   
+0*** PROGRAM EXECUTION BEGINNING - ANY OUTPUT BEFORE EXECUTION TIME MESSAGE IS PRODUCED BY USER PROGRAM ***                       
+1                            List of Numbers                                                                                      
+0      -26924          29          97        3290         355                                                                     
+0          74        -350        -724           7         -37                                                                     
+0          53       -8909          21          46          13                                                                     
+0         591          10          26       -1869       -6299                                                                     
+0           3         333      -15141         868         662                                                                     
+0         859        -529          35        -288       -8942                                                                     
+0       27446       -6729           6        3548         -84                                                                     
+0        -840      -13931       32439       -5537          82                                                                     
+0         833          58        3977       22386       20537                                                                     
+0        7595       -4350        -374          21         -65                                                                     
+0        4734          18        -788       -3728       22483                                                                     
+0         310         514       18935       -5249                                                                                 
+1                            List of Odd Numbers                                                                                  
+0          29          97         355           7         -37          53                                                         
+0       -8909          21          13         591       -1869       -6299                                                         
+0           3         333      -15141         859        -529          35                                                         
+0       -6729      -13931       32439       -5537         833        3977                                                         
+0       20537        7595          21         -65       22483       18935                                                         
+0       -5249                                                                                                                     
+0*** EXECUTION TIME =    0.002 SECS.      2191 INSTRUCTIONS EXECUTED -  1095500 INSTRUCTIONS/SEC ***                              
+0*** AM004 - NORMAL USER TERMINATION BY RETURN ***                                                                                

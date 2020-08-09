@@ -1,0 +1,251 @@
+//KC03F62P JOB ,'Matthew Lord',MSGCLASS=H                               00010000
+//STEP1    EXEC  PGM=ASSIST                                             00020000
+//STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                    00030001
+//SYSPRINT   DD  SYSOUT=*                                               00040000
+//SYSIN      DD  *                                                      00050000
+*********************************************************************   00060000
+*                                                                       00070000
+*  Program: ASSIGN8                                                     00080000
+*  Programmer: Matthew Lord                                             00090000
+*                                                                       00100000
+*********************************************************************   00110000
+ENTRY    DSECT                    Format for the table                  00120000
+ID       DS    CL4                                                      00130005
+PAS      DS    CL10                                                     00140000
+DAY      DS    CL10                                                     00150014
+HOUR     DS    CL2                                                      00151000
+MIN      DS    CL2                                                      00152000
+ROOM     DS    CL3                                                      00153000
+*********************************************************************   00160000
+*                                                                       00170000
+*  Register usage:                                                      00180000
+*  15   MAIN                                                            00190000
+*  14   EXIT                                                            00200000
+*  13   Save Location                                                   00210000
+*  10   Location to branch to                                           00220000
+*  1    Params                                                          00230000
+*********************************************************************   00240000
+MAIN     CSECT                                                          00250000
+         USING MAIN,15                                                  00260000
+         ST    14,EXIT            Save exit location                    00270000
+         LA    13,SAVEM           Set the save area                     00280000
+         LA    1,TABLE            Start loading params into PARMS       00290000
+         ST    1,PARMS                                                  00300000
+         LA    1,EOT                                                    00310000
+         ST    1,PARMS+4                                                00320000
+         LA    1,PARMS            End loading params into PARMS         00330000
+         L     10,=V(BUILD)                                             00340000
+         BALR  14,10              Branch to Build                       00350000
+         XDUMP TABLE,60                                                 00360000
+         LA    1,HEADA                                                  00361008
+         ST    1,PARMS+8                                                00362008
+         LA    1,PARMS            End loading params into PARMS         00363008
+         L     10,=V(PRINT)                                             00364008
+         BALR  14,10              Branch to Print                       00365008
+         LA    1,PARMS                                                  00366023
+         L     10,=V(SORT)                                              00367023
+         BALR  14,10              Branch to sort                        00368023
+         LA    1,HEADB                                                  00369023
+         ST    1,PARMS+8                                                00369123
+         LA    1,PARMS                                                  00369223
+         L     10,=V(PRINT)                                             00369325
+         BALR  14,10              Branch to print                       00369425
+*                                                                       00370000
+         L     14,EXIT            Load exit location                    00380000
+         BR    14                 End program                           00390000
+         LTORG                    Literals are put here                 00400000
+         ORG   MAIN+((*-MAIN+31)/32)*32                                 00410000
+TABLE    DC    20CL32'FF'                                               00420008
+EOT      DS    F                                                        00430000
+HEADA    DC    CL49'1                      Initial Table Contents    '  00431026
+HEADB    DC    CL49'1                      Table Sorted by ID        '  00432026
+PARMS    DC    4F'0'                                                    00440000
+SAVEM    DS    18F'0'                                                   00450000
+EXIT     DS    F                                                        00460000
+*********************************************************************   00470000
+*                                                                       00480000
+*  Register usage:                                                      00490000
+*   15    DON'T USE                                                     00500000
+*   14    Exit                                                          00510000
+*   13    Save area                                                     00520000
+*   8     Location of EOT                                               00530000
+*   7     Start of table                                                00540000
+*   4     Length of item in the buff                                    00550000
+*   2,3   Buffer for binary formating                                   00560000
+*   1     Location of params                                            00570000
+*********************************************************************   00580000
+BUILD    CSECT                                                          00590000
+         STM   14,12,12(13)                                             00600000
+         LR    12,15                                                    00610000
+         USING BUILD,10           External register is R10              00620000
+         LA    14,SAVEB                                                 00630000
+         ST    13,4(14)                                                 00640000
+         ST    14,8(13)                                                 00650000
+         LR    13,14                                                    00660000
+*                                                                       00670000
+         LM    7,8,0(1)           Load params                           00680000
+         USING ENTRY,7                                                  00690000
+READ     XREAD BUFF,80            Read in lines                         00700000
+         BL    REND                                                     00710000
+         LA    1,BUFF                                                   00720000
+*ID                                                                     00730000
+         PACK  TEMP(8),1(7,1)     Pack ID                               00740007
+         CVB   2,TEMP             Convert ID to binary                  00750000
+         STCM  2,B'1111',ID       Store                                 00760000
+*Password                                                               00770000
+         MVC   PAS(10),12(1)                                            00780012
+         XC    PAS(4),ID          Encode pass                           00790000
+         XC    PAS+4(4),ID        Encode pass                           00800000
+*Day of week                                                            00810000
+         MVC   DAY(10),23(1)       Store day                            00820014
+*Hour                                                                   00830000
+         MVC   HOUR(2),37(1)      Store the hour                        00840000
+*Min                                                                    00850000
+         MVC   MIN(2),40(1)       Store the min                         00860000
+*Room                                                                   00870000
+         MVC   ROOM(3),46(1)      Store the room number                 00880000
+*                                                                       00890000
+         LA    7,32(7)            Advance pointer                       00900008
+         B     READ               Back to top of loop                   00910000
+REND     DS    0H                                                       00920000
+         ST    7,0(0,8)           Store EOT                             00930000
+         L     13,4(13)                                                 00940000
+         LM    14,12,12(13)                                             00950000
+         BR    14                 End subroutine                        00960000
+         LTORG                    Literals are put here                 00970000
+BUFF     DC    80C' '                                                   00980000
+         DC    C'*'                                                     00990000
+TEMP     DS    D                                                        01000006
+SAVEB    DS    18F'0'                                                   01010000
+*********************************************************************   01020000
+*                                                                       01021008
+*  Register usage:                                                      01022008
+*   15    DON'T USE                                                     01023008
+*   14    Exit                                                          01024008
+*   13    Save area                                                     01025008
+*   9     Location of page header                                       01026008
+*   8     Location of EOT                                               01027008
+*   7     Table pointer                                                 01028008
+*   6     Counter                                                       01029008
+*   2     Tegisters for binary changing                                 01029108
+**********************************************************************  01029208
+PRINT    CSECT                                                          01029308
+         STM   14,12,12(13)                                             01029408
+         LR    12,15                                                    01029508
+         USING PRINT,10           Use R10 as base register              01029608
+         LM    7,9,0(1)                                                 01029708
+         LA    14,SAVEC                                                 01029808
+         ST    13,4(14)                                                 01029908
+         ST    14,8(13)                                                 01030008
+         LR    13,14                                                    01030108
+*                                                                       01030208
+         USING ENTRY,7                                                  01030308
+         L     6,=F'0'                                                  01030408
+PLOOP    C     7,0(0,8)                                                 01030508
+         BE    PEND                                                     01030608
+         C     6,=F'0'                                                  01030708
+         BE    PHEADER            Print header                          01030808
+CONT     DS    0H                                                       01030908
+*                                                                       01031008
+         MVC   DTEMP(8),ID        Move id into a fullword               01031108
+         L     2,DTEMP            Load ID                               01031208
+         CVD   2,DTEMP            Convert to packed                     01031308
+         MVC   PID(10),=X'40212020202020202020'  format ID              01031408
+         ED    PID(10),DTEMP+3    Format                                01031508
+         MVI   PLINE+2,C'R'                                             01031711
+*                                                                       01031808
+         MVC   PTEMP(10),PAS      Set password                          01031914
+         XC    PTEMP(4),ID        Decode                                01032008
+         XC    PTEMP+4(4),ID      Decode                                01032108
+         MVC   PPAS(10),PTEMP     Store pass                            01032211
+*                                                                       01032308
+         MVC   PDAY(10),DAY        Set Day                              01032414
+         MVC   PHOUR(2),HOUR      Set Hour                              01032508
+         MVC   PMIN(2),MIN        Set Min                               01032608
+         MVC   PROOM(3),ROOM      Set Room                              01032708
+         XPRNT PLINE,49           Print Line                            01032831
+         LA    7,32(7)            Advance pointer                       01032908
+         A     6,=F'1'                                                  01033008
+         B     PLOOP                                                    01033108
+*                                                                       01033208
+PHEADER  XPRNT 0(9),49            Print page header                     01033308
+         XPRNT HEAD1,50           Print table header                    01033421
+         B     CONT               Continue printing                     01033510
+PEND     L     13,4(13)                                                 01033608
+         LM    14,12,12(13)                                             01033708
+         BR    14                 End of subroutine                     01033808
+         LTORG                    Literals are put here                 01033908
+PLINE    DC    1C' '                                                    01034131
+PID      DC    10C' '                                                   01034208
+         DC    2C' '                                                    01034308
+PPAS     DC    10C' '                                                   01034413
+         DC    2C' '                                                    01034513
+PDAY     DC    10C' '                                                   01034614
+         DC    4C' '                                                    01034713
+PHOUR    DC    2C' '                                                    01034808
+         DC    1C':'                                                    01034908
+PMIN     DC    2C' '                                                    01035008
+         DC    2C' '                                                    01035108
+PROOM    DC    3C' '                                                    01035208
+PTEMP    DS    12C                                                      01035308
+DTEMP    DS    D                                                        01035408
+HEAD1    DC    CL38'-ID Number   Password     Day         '             01035519
+         DC    CL12' Time   Room'                                       01035621
+SAVEC    DC    18F'0'                                                   01035709
+*********************************************************************   01035809
+*                                                                       01035923
+*  Register usage:                                                      01036023
+*   15    DON'T USE                                                     01036123
+*   14    EXIT                                                          01036223
+*   13    Save Area                                                     01036323
+*   8     Location of EOT                                               01036423
+*   7     Location of table                                             01036523
+*   4     Lower table element                                           01036623
+*   2     sort start location                                           01036723
+*********************************************************************   01036823
+SORT     CSECT                                                          01036923
+         STM   14,12,12(13)                                             01037023
+         LR    12,15                                                    01037123
+         USING SORT,10                                                  01037223
+         LA    14,SAVED                                                 01037323
+         ST    13,4(14)                                                 01037423
+         ST    14,8(13)                                                 01037523
+         LR    13,14                                                    01037623
+         LM    7,8,0(1)                                                 01037723
+*                                                                       01037823
+         L     2,0(7)                                                   01037923
+         L     8,0(8)                                                   01038023
+         S     8,=F'32'                                                 01038123
+         USING ENTRY,2                                                  01038223
+FOR      DS    0H                                                       01038323
+         S     8,=F'32'                                                 01038423
+         LR    2,7                                                      01038523
+         S     2,=F'32'                                                 01038623
+         CR    2,8                                                      01038723
+         BE    SEND                                                     01038823
+         BH    SEND                                                     01038923
+WHILE    DS    0H                                                       01039023
+         A     2,=F'32'                                                 01039123
+         CLC   0(2,2),32(2)       Comparison                            01039223
+         BH    SWAP                                                     01039327
+BSWAP    DS    0H                                                       01039423
+         CR    2,8                                                      01039523
+         BH    FOR                                                      01039623
+         BL    WHILE                                                    01039723
+         B     FOR                Branch to top of for                  01039823
+SWAP     DS    0H                 SWAP the two elements                 01039923
+         MVC   STEMP(32),0(2)     Store R3 in temp                      01040023
+         MVC   0(32,2),32(2)      Store R4 in R3                        01040123
+         MVC   32(32,2),STEMP     Store temp in R4                      01040223
+         B     BSWAP                                                    01040323
+SEND     L     13,4(13)                                                 01040423
+         LM    14,12,12(13)                                             01040523
+         BR    14                 End of subroutine                     01040623
+         LTORG                    Literals are put here                 01040723
+SAVED    DS    18F'0'                                                   01040823
+STEMP    DS    32C                                                      01040923
+*********************************************************************   01041023
+         END   MAIN                                                     01041100
+/*                                                                      01042000
+//FT05F001  DD  DSN=KC02314.SUMMER18.CSCI360.HW8DATA,DISP=SHR           01050000
+//                                                                      01060000

@@ -1,0 +1,91 @@
+//KC03F62P JOB ,'Matthew Lord',MSGCLASS=H
+//STEP1    EXEC  PGM=ASSIST
+//STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR
+//SYSPRINT   DD  SYSOUT=*
+//SYSIN      DD  *
+************************************************************
+*
+*  Program:     ASSIGN2
+*  Programmer:  Matthew Lord
+*
+*  Register usage:
+*  1     used by XDECI 
+*  2     counter 
+*  3     total 
+*  5     first number 
+*  6     second number
+*  7     third number 
+*  8     fourth number
+*  14    set by ASSIST (don't touch)
+*  15    set by ASSIST (don't touch)
+*   
+*
+************************************************************
+MAIN     CSECT
+         USING MAIN,15
+         SR    2,2                Initialize counter
+         SR    3,3                Initialize total 
+LOOP     XREAD BUFFER,80          Read a line
+         BC    B'0100',LOOPEND    AT EOF,QUIT
+         XDECI 5,BUFFER           Get a number and store it in R5
+         XDECO 5,WVALUE           Put decimal form into WVALUE
+         XDECI 6,0(1)             Get the X value and store it in R6
+         XDECO 6,XVALUE           Put decimal form into XVALUE 
+         XDECI 7,1(1)             Get the Y value and store it in R7
+         XDECO 7,YVALUE           Put decimal form into YVALUE
+         XDECI 8,2(1)             Get the Z value and store it in R8
+         XDECO 8,ZVALUE           Put decimal form into ZVALUE
+         
+         SR    5,6                Subtract the value in R5 by R6 storing in R5 
+         AR    5,7                Add the values in R5 and R7 storing in R5
+         SR    5,8                Subtract the value in R5 by R8 storing in R5
+         XDECO 5,RESULT           Put the decimal form into RESULT
+         XPRNT LINE,93            Print out everything 
+         A     2,=F'1'            Add one to the counter 
+         AR    3,5                Add result to total          
+         BC    B'1111',LOOP       
+ENDLOOP  DS    0H
+         XDECO 3,SOR              Put the decimal form into SOR 
+         XDECO 2,COUNT            Put the decimal form into COUNT 
+         XPRNT LINE2,59           print out counter and total 
+         XDUMP
+         BR    14
+BUFFER   DS    80C
+LINE     DC    C' '               Single space carriage control 
+         DC    CL3'W='            Output format for w
+WVALUE   DS    12C
+         DC    CL6'   X='         Output format for x
+XVALUE   DS    12C
+         DC    CL6'   Y='         Output format for y
+YVALUE   DS    12C
+         DC    CL6'   Z='         Output format for z
+ZVALUE   DS    12C
+         DC    CL11'   Result='
+RESULT   DS    12C
+LINE2    DC    C' '               Single space carriage control 
+         DC    CL16'Number of lines='
+COUNT    DS    12C
+         DC    CL18'   Sum of Results='
+SOR      DS    12C                Sum of Results 
+
+         END   MAIN
+/*
+//FT05F001   DD  * 
+    0006   0001   0002   0004     w-x+y-z     6-1+2-4     R5-R6+R7-R8 
+    9991   9972   9908   9926
+    4500   -230      9     58
+       0     +7      2    -45
+    8516   2853      0     17
+    0020      0   3245    316
+    5529   6977   1681      0
+    1013    250     85    831
+       0   3364   5275      0
+    -887   1100   2293   -993
+    1234   4447   8591     13   
+     -89     -7     23   -104
+    8513   5409   2538   1001
+    0001   0002   0003   0004
+    9999   9998   9997   9996
+/*
+//FT06F001   DD SYSOUT=*
+//

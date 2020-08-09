@@ -1,0 +1,147 @@
+//KC03F62P JOB ,'Matthew Lord',MSGCLASS=H
+//STEP1    EXEC  PGM=ASSIST
+//STEPLIB    DD  DSN=KC02293.ASSIST.LOADLIB,DISP=SHR
+//SYSPRINT   DD  SYSOUT=*
+//SYSIN      DD  *
+************************************************************
+*
+*  Program:     ASSIGN3
+*  Programmer:  Matthew Lord
+*
+*  Register usage:
+*  1     used by XDECI 
+*  2     counter 
+*  3     total 
+*  5     order id
+*  6     number ordered 
+*  7     used for multiplication
+*  8     price of item 
+*  9     product id 
+*  10    discount
+*  11    shipping 
+*  12    counter for free shipping 
+*  14    set by ASSIST (don't touch)
+*  15    set by ASSIST (don't touch)
+*   
+*
+************************************************************
+MAIN     CSECT
+         USING MAIN,15
+         SR    2,2                Initialize counter
+         SR    3,3                Initialize total 
+         SR    12,12              Initialize counter for free shipping 
+         XPRNT HEADER,29          Print out the header
+         XPRNT INFO,94           Print out the column headers 
+LOOP     XREAD BUFFER,80          Read a line
+         BC    B'0100',LOOPEND    AT EOF,QUIT
+         XDECI 5,BUFFER           Get the order id and store it in R5
+         XDECO 5,ORDERID          Store that vaule into ORDERID
+         XDECI 6,0(1)             Get the number orderd and store it in R6
+         XDECO 6,NUMORDER         Store that value into NUMORDER 
+         XDECI 8,1(1)             Get the price each and store it in R8
+         XDECO 8,PRICE            Store that value into PRICE
+         XDECI 9,2(1)             Get the product id and store it in R9
+         XDECO 9,PID              Store that value into PID
+* Code for getting PreTotal 
+         LR    7,6                Load the value of Register 6 into register 7 for multiplication
+         MR    6,8                Multiply the price each by the number ordered
+* Code for getting discount          
+         C     7,=F'25000'        Compare R7 and the value 25000 
+         BNH   ENDIF           If the PreTotal is greater then 25000 
+         L     10,=F'500'         Load the value of the discount into R10 
+ENDIF    BH    ENDIF1          If the PreTotal is less then 25000
+         L     10,=F'0'           Load the value of the discount into R10 
+ENDIF1   XDECO 10,DISCOUNT        Store that value into DISCOUNT 
+* Code for getting shipping 
+         C     7,=F'10000'        Compare R7 and the value 10000
+         BNH   ENDIF3          IF the PreTotal is greater then 10000
+         L     11,=F'0'           Load the value of the shipping into R11
+         A     12,=F'1'           Add to the count of free shipping 
+ENDIF3   BH    ENDIF4         If the PreTotla is less then 10000
+         L     11,=F'750'         Load the value of the shipping into R11 
+ENDIF4   BNE   ENDIF5         If they are not equal branch 
+         L     11,=F'0'         Load the value o the shipping into R11   
+         A     12,=F'1'           Add to the count of free shipping          
+ENDIF5   XDECO 11,SHIPPING        Store that value into SHIPPING 
+         AR    7,11               Add shipping to PreTotal 
+         SR    7,10               Subtract the Discount 
+         XDECO 7,TOTAL            Store the total price into TOTAL 
+         XPRNT LINE,85            Print out everything 
+         A     2,=F'1'            Add one to the counter     
+         AR    3,7                Add total to grand total          
+         BC    B'1111',LOOP       
+LOOPEND  DS    0H
+         XDECO 2,COUNTER          Store the counter into COUNTER 
+         XPRNT CT,36
+         XDECO 12,FREE            Store the free shipping counter into FREE
+         XPRNT FS,39 
+         XDECO 3,GRAND            Store the grand total into GRAND 
+         XPRNT GT,30 
+         SR    4,4                Clear out R4 
+         LR    5,3                Load the value of R3 into R6 
+         DR    4,2                To get the average
+         AR     4,4               Double R4 
+         CR    4,2                Compare R4 and R2 
+         BNH   ENDIF6             If the remainder * 2 is greater then the divisor 
+         A     5,=F'1'             Add one to R5 
+ENDIF6   BNE    ENDIF7             If they are equal 
+         A     5,=F'1'            Add one to R5 
+ENDIF7   XDECO 5,AVG              Store the average in AVG     
+         XPRNT AVERAGE,32         Print out the average      
+         BR    14
+HEADER   DC    C'0'               Double space carriage control
+         DC    CL28'Sales Report -- Widgets-R-Us'   
+INFO     DC    C'0'               Double space carriage control
+         DC    CL13'ORDER ID     '        
+         DC    CL15'PRODUCT ID     '       
+         DC    CL15'PRICE EACH     '     
+         DC    CL19'NUMBER ORDERED     '      
+         DC    CL13'DISCOUNT     '         
+         DC    CL13'SHIPPING     '           
+         DC    CL5'TOTAL'
+BUFFER   DS    80C
+LINE     DC    C'0'               Double space carriage control 
+ORDERID  DS    12C                For printing out the order id 
+PID      DS    12C                For printing out the product id 
+PRICE    DS    12C                For printing out the price 
+NUMORDER DS    12C                For printing out the order number 
+DISCOUNT DS    12C                For printing out the discount 
+SHIPPING DS    12C                For printing out the shipping cost 
+TOTAL    DS    12C                For printing out the total cost 
+CT       DC    C'0'               Double space carriage control
+         DC    CL23'TOTAL NUMBER OF SALES:'
+COUNTER  DS    12C                For printing out the counter
+FS       DC    C'0'               Double space carriage control
+         DC    CL26'NUMBER WITH FREE SHIPPING:'
+FREE     DS    12C                For printing out the free shipping counter 
+GT       DC    C'0'               Double space carriage control 
+         DC    CL17'SUM OF ALL SALES:'
+GRAND    DS    12C                For printing out the grand total 
+AVERAGE  DC    C'0'               Double space carriage control 
+         DC    CL19'AVERAGE SALE TOTAL:'
+AVG      DS    12C
+         END   MAIN
+/*
+//FT05F001   DD  DSN=KC02314.SUMMER18.CSCI360.HW3DATA,DISP=SHR
+//FT06F001   DD SYSOUT=*
+//
+
+To do:
+the average Total Cost per Sale, This is the grand total divided by the number of sales so 1116650 / 20 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
